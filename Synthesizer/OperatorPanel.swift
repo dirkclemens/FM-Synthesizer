@@ -47,8 +47,9 @@ struct OperatorPanel: View {
  )
 
  VStack(alignment: .leading, spacing: 8) {
+ HStack(spacing: 12) {
  // Ratio
- LabeledSlider(
+ Knob(
  title: "Ratio",
  value: Binding(
  get: { params.0 },
@@ -56,12 +57,13 @@ struct OperatorPanel: View {
  ),
  range: 0.5...8.0,
  step: 0.5,
- unit: "",
  formatter: { String(format: "%.1f", $0) }
  )
-
+ 
+ Spacer()
+ 
  // Detune
- LabeledSlider(
+ Knob(
  title: "Detune",
  value: Binding(
  get: { params.1 },
@@ -69,10 +71,9 @@ struct OperatorPanel: View {
  ),
  range: -100...100,
  step: 1,
- unit: " ct",
  formatter: { String(format: "%.0f", $0) }
  )
-
+ 
  // Level
  Knob(
  title: "Level",
@@ -84,11 +85,12 @@ struct OperatorPanel: View {
  step: 0.01,
  formatter: { String(format: "%.2f", $0) }
  )
+ }
 
  // ADSR
  HStack(spacing: 12) {
  Knob(
- title: "A",
+ title: "Attack",
  value: Binding(
  get: { params.3 },
  set: { newValue in updateOperatorParam(index: 3, value: newValue) }
@@ -100,7 +102,7 @@ struct OperatorPanel: View {
  .frame(maxWidth: .infinity)
 
  Knob(
- title: "D",
+ title: "Decay",
  value: Binding(
  get: { params.4 },
  set: { newValue in updateOperatorParam(index: 4, value: newValue) }
@@ -112,7 +114,7 @@ struct OperatorPanel: View {
  .frame(maxWidth: .infinity)
 
  Knob(
- title: "S",
+ title: "Sustain",
  value: Binding(
  get: { params.5 },
  set: { newValue in updateOperatorParam(index: 5, value: newValue) }
@@ -124,7 +126,7 @@ struct OperatorPanel: View {
  .frame(maxWidth: .infinity)
 
  Knob(
- title: "R",
+ title: "Release",
  value: Binding(
  get: { params.6 },
  set: { newValue in updateOperatorParam(index: 6, value: newValue) }
