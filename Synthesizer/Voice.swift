@@ -107,6 +107,9 @@ final class Voice {
  /// - velocity: Note velocity (0–127).
  /// - baseFrequency: The fundamental frequency in Hz (before ratio/detune).
  func noteOn(midiNote: UInt8, velocity: Float, baseFrequency: Float) {
+ // Silence any previous note on this voice to avoid clicks when stealing voices
+ silence()
+ 
  self.midiNote = midiNote
  self.state = .active
  
