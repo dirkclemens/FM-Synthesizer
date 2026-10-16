@@ -19,36 +19,57 @@ struct Knob: View {
  @State private var startValue: Float = 0
  @State private var startLocation: CGPoint = .zero
 
- private let knobSize: CGFloat = 70
+ private let knobSize: CGFloat = 64
 
  var body: some View {
  VStack(spacing: 6) {
  Text(title)
  .font(.caption)
  .foregroundColor(.secondary)
+ .fontWeight(.medium)
 
  ZStack {
- // Background ring
+ // Background ring - subtle
  Circle()
- .stroke(Color.gray.opacity(0.3), lineWidth: 6)
+ .stroke(Color.white.opacity(0.1), lineWidth: 5)
  .frame(width: knobSize, height: knobSize)
 
- // Value ring
+ // Value ring - colored
  Circle()
  .trim(from: 0, to: CGFloat(normalizedValue))
- .stroke(Color.blue, lineWidth: 6)
+ .stroke(
+ LinearGradient(
+ colors: [Color.blue, Color.purple],
+ startPoint: .topLeading,
+ endPoint: .bottomTrailing
+ ),
+ lineWidth: 6
+ )
  .rotationEffect(.degrees(-90))
  .frame(width: knobSize, height: knobSize)
 
  // Center knob
  Circle()
- .fill(Color(NSColor.controlBackgroundColor))
- .shadow(color: Color.black.opacity(0.2), radius: 2, x: 0, y: 1)
- .frame(width: knobSize * 0.55, height: knobSize * 0.55)
+ .fill(
+ LinearGradient(
+ colors: [Color.white.opacity(0.9), Color.white.opacity(0.4)],
+ startPoint: .topLeading,
+ endPoint: .bottomTrailing
+ )
+ )
+ .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 1)
+ .frame(width: knobSize * 0.5, height: knobSize * 0.5)
  .overlay(
  Text(formatter(value))
- .font(.system(size: 11, design: .monospaced))
+ .font(.system(size: 10, design: .monospaced))
  .foregroundColor(.primary)
+ .fontWeight(.medium)
+ )
+ .overlay(
+ Circle()
+ .fill(Color.black.opacity(0.2))
+ .frame(width: 4, height: 4)
+ .offset(y: -knobSize * 0.18)
  )
  }
  .gesture(

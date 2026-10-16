@@ -16,11 +16,12 @@ struct LabeledSlider: View {
  let formatter: (Float) -> String
 
  var body: some View {
- VStack(alignment: .leading, spacing: 4) {
+ VStack(alignment: .leading, spacing: 6) {
  HStack {
  Text(title)
  .font(.caption)
  .foregroundColor(.secondary)
+ .fontWeight(.medium)
  Spacer()
  Text(formatter(value) + unit)
  .font(.system(size: 11, design: .monospaced))
@@ -29,9 +30,10 @@ struct LabeledSlider: View {
  }
 
  Slider(value: $value, in: range, step: step)
- .accentColor(.blue)
+ .accentColor(Color.blue.opacity(0.8))
+ .tint(Color.blue)
  }
- .padding(.horizontal, 8)
+ .padding(.horizontal, 10)
  }
 }
 

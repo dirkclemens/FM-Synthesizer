@@ -13,11 +13,41 @@ struct SequencerView: View {
  let columns = Array(repeating: GridItem(.flexible(), spacing: 2), count: 16)
  
  var body: some View {
- VStack(alignment: .leading, spacing: 8) {
- Text("Sequencer (16-step)")
+ VStack(alignment: .leading, spacing: 0) {
+ // Header
+ HStack {
+ ZStack {
+ Circle()
+ .fill(Color.orange.opacity(0.2))
+ .frame(width: 24, height: 24)
+ Circle()
+ .stroke(Color.orange, lineWidth: 2)
+ .frame(width: 24, height: 24)
+ Text("S")
+ .font(.system(size: 10, weight: .bold, design: .monospaced))
+ .foregroundColor(.orange)
+ }
+ Text("Sequencer")
  .font(.headline)
- .foregroundColor(.secondary)
- 
+ .foregroundColor(.primary)
+ Spacer()
+ Text(sequencer.isRunning ? "ON" : "OFF")
+ .font(.caption2)
+ .fontWeight(.bold)
+ .foregroundColor(sequencer.isRunning ? .orange : .secondary)
+ }
+ .padding(.horizontal, 10)
+ .padding(.top, 10)
+ .background(
+ RoundedRectangle(cornerRadius: 8)
+ .fill(Color.white.opacity(0.05))
+ )
+ .overlay(
+ RoundedRectangle(cornerRadius: 8)
+ .stroke(Color.orange.opacity(0.3), lineWidth: 1)
+ )
+
+ VStack(alignment: .leading, spacing: 12) {
  // On/Off toggle
  HStack {
  Toggle("Sequencer", isOn: Binding(
@@ -32,11 +62,8 @@ struct SequencerView: View {
  ))
  .font(.caption)
  Spacer()
- Text(sequencer.isRunning ? "ON" : "OFF")
- .font(.caption2)
- .foregroundColor(sequencer.isRunning ? .green : .secondary)
  }
- 
+
  // Step grid
  LazyVGrid(columns: columns, spacing: 2) {
  ForEach(0..<Sequencer.stepCount, id: \.self) { index in
@@ -66,8 +93,16 @@ struct SequencerView: View {
  )
  }
  .padding(10)
- .background(Color(NSColor.controlBackgroundColor).opacity(0.3))
- .cornerRadius(6)
+ }
+ .background(
+ RoundedRectangle(cornerRadius: 10)
+ .fill(Color(NSColor.controlBackgroundColor).opacity(0.4))
+ )
+ .overlay(
+ RoundedRectangle(cornerRadius: 10)
+ .stroke(Color.orange.opacity(0.4), lineWidth: 1.5)
+ )
+ .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
  }
 }
 

@@ -141,7 +141,6 @@
 				FD6686422968D8A700FD8C4A /* Synthesizer.entitlements */,
 				FD66866B2968E6EF00FD8C4A /* Oscillator.swift */,
 				FD6686702968E70000FD8C4A /* Operator.swift */,
-				FD6686722968E70000FD8C4A /* Voice.swift */,
 				FD6686742968E70000FD8C4A /* Algorithms.swift */,
 				FD6686762968E70000FD8C4A /* SynthEngine.swift */,
 				FD66867A2968E70000FD8C4A /* LFO.swift */,
@@ -162,6 +161,7 @@
 				FD6686982968E70000FD8C4A /* SequencerView.swift */,
 				FD66869A2968E70000FD8C4A /* MIDIManager.swift */,
 				FD66869C2968E70000FD8C4A /* MacKeyboardHandler.swift */,
+				FD6686722968E70000FD8C4A /* Voice.swift */,
 			);
 			path = Synthesizer;
 			sourceTree = "<group>";

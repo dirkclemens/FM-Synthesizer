@@ -11,11 +11,41 @@ struct ArpeggiatorView: View {
  @ObservedObject var arpeggiator: Arpeggiator
  
  var body: some View {
- VStack(alignment: .leading, spacing: 8) {
+ VStack(alignment: .leading, spacing: 0) {
+ // Header
+ HStack {
+ ZStack {
+ Circle()
+ .fill(Color.green.opacity(0.2))
+ .frame(width: 24, height: 24)
+ Circle()
+ .stroke(Color.green, lineWidth: 2)
+ .frame(width: 24, height: 24)
+ Text("A")
+ .font(.system(size: 10, weight: .bold, design: .monospaced))
+ .foregroundColor(.green)
+ }
  Text("Arpeggiator")
  .font(.headline)
- .foregroundColor(.secondary)
- 
+ .foregroundColor(.primary)
+ Spacer()
+ Text(arpeggiator.isRunning ? "ON" : "OFF")
+ .font(.caption2)
+ .fontWeight(.bold)
+ .foregroundColor(arpeggiator.isRunning ? .green : .secondary)
+ }
+ .padding(.horizontal, 10)
+ .padding(.top, 10)
+ .background(
+ RoundedRectangle(cornerRadius: 8)
+ .fill(Color.white.opacity(0.05))
+ )
+ .overlay(
+ RoundedRectangle(cornerRadius: 8)
+ .stroke(Color.green.opacity(0.3), lineWidth: 1)
+ )
+
+ VStack(alignment: .leading, spacing: 12) {
  // On/Off toggle
  HStack {
  Toggle("Arpeggiator", isOn: Binding(
@@ -29,12 +59,11 @@ struct ArpeggiatorView: View {
  }
  ))
  .font(.caption)
+ Toggle("Arpeggiator", isOn: .constant(false))
+ .opacity(0)
  Spacer()
- Text(arpeggiator.isRunning ? "ON" : "OFF")
- .font(.caption2)
- .foregroundColor(arpeggiator.isRunning ? .green : .secondary)
  }
- 
+
  // Mode picker
  Picker("Mode", selection: $arpeggiator.mode) {
  ForEach(ArpMode.allCases, id: \.self) { mode in
@@ -87,8 +116,16 @@ struct ArpeggiatorView: View {
  )
  }
  .padding(10)
- .background(Color(NSColor.controlBackgroundColor).opacity(0.3))
- .cornerRadius(6)
+ }
+ .background(
+ RoundedRectangle(cornerRadius: 10)
+ .fill(Color(NSColor.controlBackgroundColor).opacity(0.4))
+ )
+ .overlay(
+ RoundedRectangle(cornerRadius: 10)
+ .stroke(Color.green.opacity(0.4), lineWidth: 1.5)
+ )
+ .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
  }
  
  private func modeLabel(_ mode: ArpMode) -> String {

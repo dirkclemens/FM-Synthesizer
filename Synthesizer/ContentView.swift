@@ -21,61 +21,61 @@ struct ContentView: View {
  // MARK: Preset browser
 // PresetBrowserView(bank: bank, engine: engine)
 
-// Divider()
+ Divider()
 
-// // MARK: MIDI Connection
-// HStack(spacing: 12) {
-// Text("MIDI Input")
-// .font(.caption)
-// .foregroundColor(.secondary)
-// 
-// if midiManager.availableSources.isEmpty {
-// Text("No MIDI sources found")
-// .font(.caption2)
-// .foregroundColor(.secondary)
-// } else {
-// Picker("MIDI Source", selection: Binding(
-// get: { midiManager.connectedSourceName.map { $0 } ?? "None" },
-// set: { newValue in
-// if let index = midiManager.availableSources.firstIndex(of: newValue) {
-// midiManager.connect(to: index)
-// } else {
-// midiManager.disconnect()
-// }
-// }
-// )) {
-// Text("None").tag("None")
-// ForEach(midiManager.availableSources, id: \.self) { name in
-// Text(name).tag(name)
-// }
-// }
-// .pickerStyle(.menu)
-// .frame(maxWidth: 200)
-// }
-// 
-// Button(midiManager.isConnected ? "Disconnect" : "Connect") {
-// if midiManager.isConnected {
-// midiManager.disconnect()
-// } else if let first = midiManager.availableSources.first,
-// let index = midiManager.availableSources.firstIndex(of: first) {
-// midiManager.connect(to: index)
-// }
-// }
-// .buttonStyle(.bordered)
-// .disabled(midiManager.availableSources.isEmpty)
-// 
-// Button("Refresh") {
-// midiManager.refreshSources()
-// }
-// .buttonStyle(.bordered)
-// .controlSize(.small)
-// 
-// Spacer()
-// 
-// Text(midiManager.isConnected ? "Connected" : "Disconnected")
-// .font(.caption2)
-// .foregroundColor(midiManager.isConnected ? .green : .secondary)
-// }
+ // MARK: MIDI Connection
+ HStack(spacing: 12) {
+ Text("MIDI Input")
+ .font(.caption)
+ .foregroundColor(.secondary)
+ 
+ if midiManager.availableSources.isEmpty {
+ Text("No MIDI sources found")
+ .font(.caption2)
+ .foregroundColor(.secondary)
+ } else {
+ Picker("MIDI Source", selection: Binding(
+ get: { midiManager.connectedSourceName.map { $0 } ?? "None" },
+ set: { newValue in
+ if let index = midiManager.availableSources.firstIndex(of: newValue) {
+ midiManager.connect(to: index)
+ } else {
+ midiManager.disconnect()
+ }
+ }
+ )) {
+ Text("None").tag("None")
+ ForEach(midiManager.availableSources, id: \.self) { name in
+ Text(name).tag(name)
+ }
+ }
+ .pickerStyle(.menu)
+ .frame(maxWidth: 200)
+ }
+ 
+ Button(midiManager.isConnected ? "Disconnect" : "Connect") {
+ if midiManager.isConnected {
+ midiManager.disconnect()
+ } else if let first = midiManager.availableSources.first,
+ let index = midiManager.availableSources.firstIndex(of: first) {
+ midiManager.connect(to: index)
+ }
+ }
+ .buttonStyle(.bordered)
+ .disabled(midiManager.availableSources.isEmpty)
+ 
+ Button("Refresh") {
+ midiManager.refreshSources()
+ }
+ .buttonStyle(.bordered)
+ .controlSize(.small)
+ 
+ Spacer()
+ 
+ Text(midiManager.isConnected ? "Connected" : "Disconnected")
+ .font(.caption2)
+ .foregroundColor(midiManager.isConnected ? .green : .secondary)
+ }
 
  // MARK: Arpeggiator + Sequencer
  HStack(spacing: 12) {
@@ -104,6 +104,7 @@ struct ContentView: View {
  OperatorPanel(operatorIndex: index, engine: engine)
  }
  }
+ .frame(maxWidth: .infinity)
  }
 
  Divider()
@@ -136,6 +137,13 @@ struct ContentView: View {
  }
  .frame(minWidth: 900, maxWidth: .infinity, minHeight: 850, maxHeight: .infinity)
  .padding(8)
+ .background(
+ LinearGradient(
+ colors: [Color.black.opacity(0.8), Color(NSColor.controlBackgroundColor).opacity(0.3)],
+ startPoint: .topLeading,
+ endPoint: .bottomTrailing
+ )
+ )
  .onAppear {
  midiManager.engine = engine
  engine.presetBank = bank
