@@ -31,6 +31,9 @@
 		FD6686852968E70000FD8C4A /* AlgorithmSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */; };
 		FD6686872968E70000FD8C4A /* OperatorPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686862968E70000FD8C4A /* OperatorPanel.swift */; };
 		FD6686892968E70000FD8C4A /* GlobalPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686882968E70000FD8C4A /* GlobalPanel.swift */; };
+		FD66868B2968E70000FD8C4A /* Preset.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66868A2968E70000FD8C4A /* Preset.swift */; };
+		FD66868D2968E70000FD8C4A /* PresetBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66868C2968E70000FD8C4A /* PresetBank.swift */; };
+		FD66868F2968E70000FD8C4A /* PresetBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66868E2968E70000FD8C4A /* PresetBrowserView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -78,6 +81,9 @@
 		FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmSelector.swift; sourceTree = "<group>"; };
 		FD6686862968E70000FD8C4A /* OperatorPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorPanel.swift; sourceTree = "<group>"; };
 		FD6686882968E70000FD8C4A /* GlobalPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalPanel.swift; sourceTree = "<group>"; };
+		FD66868A2968E70000FD8C4A /* Preset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preset.swift; sourceTree = "<group>"; };
+		FD66868C2968E70000FD8C4A /* PresetBank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetBank.swift; sourceTree = "<group>"; };
+		FD66868E2968E70000FD8C4A /* PresetBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetBrowserView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +148,9 @@
 				FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */,
 				FD6686862968E70000FD8C4A /* OperatorPanel.swift */,
 				FD6686882968E70000FD8C4A /* GlobalPanel.swift */,
+				FD66868A2968E70000FD8C4A /* Preset.swift */,
+				FD66868C2968E70000FD8C4A /* PresetBank.swift */,
+				FD66868E2968E70000FD8C4A /* PresetBrowserView.swift */,
 				FD1F702229A7DD8800B2D690 /* Keyboard.swift */,
 			);
 			path = Synthesizer;
@@ -317,6 +326,9 @@
 				FD6686852968E70000FD8C4A /* AlgorithmSelector.swift in Sources */,
 				FD6686872968E70000FD8C4A /* OperatorPanel.swift in Sources */,
 				FD6686892968E70000FD8C4A /* GlobalPanel.swift in Sources */,
+				FD66868B2968E70000FD8C4A /* Preset.swift in Sources */,
+				FD66868D2968E70000FD8C4A /* PresetBank.swift in Sources */,
+				FD66868F2968E70000FD8C4A /* PresetBrowserView.swift in Sources */,
 			);
 		};
 		FD6686432968D8A700FD8C4A /* Sources */ = {

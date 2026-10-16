@@ -84,6 +84,12 @@ final class Voice {
  op.release = p.release
  }
  }
+
+ /// Sets the on/off state of a single operator.
+ func setOperatorIsOn(_ isOn: Bool, at index: Int) {
+ guard index >= 0, index < operators.count else { return }
+ operators[index].isOn = isOn
+ }
  
  // MARK: - LFO configuration
  

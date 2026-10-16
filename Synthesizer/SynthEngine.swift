@@ -89,6 +89,9 @@ final class SynthEngine: ObservableObject {
  (6.0, 0, 0.2, 0.1, 0.1, 0.5, 0.5), // Operator 6
  ]
 
+ /// Per-operator on/off state.
+ @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6)
+
  /// Parameter lock for thread-safe reads on the audio thread.
  private let paramLock = ParameterLock()
 
@@ -158,7 +161,8 @@ final class SynthEngine: ObservableObject {
  lfoWave: self.lfoWave,
  pitchBendRange: self.pitchBendRange,
  pitchBendValue: self.pitchBendValue,
- operatorParams: self.operatorParams
+ operatorParams: self.operatorParams,
+ operatorIsOn: self.operatorIsOn
  )
  }
 
@@ -167,6 +171,11 @@ final class SynthEngine: ObservableObject {
  // Update voice algorithm if changed.
  voice.setAlgorithm(fmAlgorithms[params.algorithmIndex])
  voice.configureOperators(params.operatorParams)
+
+ // Apply per-operator on/off state.
+ for (index, isOn) in params.operatorIsOn.enumerated() {
+ voice.setOperatorIsOn(isOn, at: index)
+ }
 
  // Apply global modulation controls.
  voice.oscillatorSync = params.oscillatorSync
@@ -277,5 +286,58 @@ final class SynthEngine: ObservableObject {
  /// Clamps a value to a range.
  private func clamp<T: Comparable>(_ value: T, _ min: T, _ max: T) -> T {
  return Swift.min(Swift.max(value, min), max)
+ }
+
+ // MARK: - Preset support
+
+ /// Current engine state as a `Preset`.
+ var preset: Preset {
+ var p = Preset(name: "Current")
+ p.algorithm = algorithmIndex
+ p.transpose = transpose
+ p.feedbackLevel = feedbackLevel
+ p.oscillatorSync = oscillatorSync
+ p.lfoRate = lfoRate
+ p.lfoWave = lfoWave.rawValue
+ for index in 0..<6 {
+ let params = operatorParams[safe: index] ?? (1.0, 0, 1.0, 0.1, 0.1, 0.5, 0.5)
+ p.operators[index] = OperatorPreset(
+ isOn: operatorIsOn[safe: index] ?? true,
+ ratio: params.0,
+ detune: params.1,
+ level: params.2,
+ attack: params.3,
+ decay: params.4,
+ sustain: params.5,
+ release: params.6
+ )
+ }
+ return p
+ }
+
+ /// Applies a `Preset` to the engine.
+ func load(preset: Preset) {
+ paramLock.sync {
+ algorithmIndex = preset.algorithm
+ transpose = preset.transpose
+ feedbackLevel = preset.feedbackLevel
+ oscillatorSync = preset.oscillatorSync
+ lfoRate = preset.lfoRate
+ lfoWave = LFOWave(rawValue: preset.lfoWave) ?? .sine
+
+ for index in 0..<6 {
+ let op = preset.operators[safe: index] ?? OperatorPreset()
+ operatorParams[index] = (
+ op.ratio,
+ op.detune,
+ op.level,
+ op.attack,
+ op.decay,
+ op.sustain,
+ op.release
+ )
+ operatorIsOn[index] = op.isOn
+ }
+ }
  }
 }

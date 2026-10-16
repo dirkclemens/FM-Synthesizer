@@ -2,18 +2,24 @@
 // ContentView.swift
 // Synthesizer
 //
-// Main window: FM synthesizer engine UI with keyboard, operator matrix,
-// per-operator controls, and global parameters.
+// Main window: FM synthesizer engine UI with preset browser, keyboard,
+// operator matrix, per-operator controls, and global parameters.
 //
 
 import SwiftUI
 
 struct ContentView: View {
  @StateObject private var engine = SynthEngine()
+ @StateObject private var bank = PresetBank()
  @State private var activeNotes: Set<UInt8> = []
 
  var body: some View {
  VStack(spacing: 0) {
+ // MARK: Preset browser
+ PresetBrowserView(bank: bank, engine: engine)
+
+ Divider()
+
  // MARK: Global controls
  GlobalPanel(engine: engine)
 
@@ -55,7 +61,7 @@ struct ContentView: View {
  )
  .padding(.bottom, 8)
  }
- .frame(minWidth: 900, minHeight: 600)
+ .frame(minWidth: 900, minHeight: 750)
  .padding(8)
  .onAppear {
  do {
