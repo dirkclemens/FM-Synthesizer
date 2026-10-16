@@ -63,8 +63,9 @@ func blackKeyCenterX(midiCode: Int) -> CGFloat {
  guard let leftWhiteNote = blackKeyLeftWhiteNote[noteInOctave] else { return 0 }
  let leftWhiteMidi = (midiCode / 12) * 12 + leftWhiteNote
  let leftWhiteX = whiteKeyXOffset(midiCode: leftWhiteMidi)
- // Center the black key on the boundary between two white keys.
- return leftWhiteX + keyboardWhiteKeyWidth / 2
+ // Center the black key on the boundary between two white keys:
+ // the right edge of the left white key (with spacing: 0 in HStack).
+ return leftWhiteX + keyboardWhiteKeyWidth
 }
 
 struct KeyboardView: View {
