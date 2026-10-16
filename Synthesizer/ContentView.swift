@@ -92,23 +92,10 @@ struct ContentView: View {
 
  Divider()
 
- // MARK: Operator matrix + operator panels
- HStack(spacing: 12) {
- // Operator matrix (6x6 visualization)
- OperatorMatrixView(algorithm: fmAlgorithms[engine.algorithmIndex])
- .frame(maxWidth: .infinity)
-
- Divider()
-
- // Six operator panels in a scrollable row
- ScrollView(.horizontal, showsIndicators: false) {
- HStack(spacing: 8) {
+ // MARK: Operator panels (6 operators in 2×3 grid)
+ LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
  ForEach(0..<6, id: \.self) { index in
  OperatorPanel(operatorIndex: index, engine: engine)
- .frame(width: 200)
- }
- }
- .padding(.horizontal, 4)
  }
  }
 
