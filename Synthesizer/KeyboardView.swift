@@ -39,7 +39,7 @@ func whiteKeyIndex(midiCode: Int) -> Int {
  let octave = midiCode / 12
  let noteInOctave = midiCode % 12
  guard let indexInOctave = whiteKeyIndexInOctave[noteInOctave] else { return 0 }
- return octave * 7 + indexInOctave
+ return (octave - 3) * 7 + indexInOctave
 }
 
 /// Returns the x-position of a white key.
