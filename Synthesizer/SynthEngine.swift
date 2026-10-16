@@ -51,48 +51,32 @@ final class SynthEngine: ObservableObject {
 
  /// Master volume (0...1).
  @Published var volume: Float = 0.5 {
- didSet { mainMixer.outputVolume = volume; saveSettings() }
+ didSet { mainMixer.outputVolume = volume }
  }
 
  /// Global transpose in semitones (-24...+24).
- @Published var transpose: Float = 0 {
- didSet { saveSettings() }
- }
+ @Published var transpose: Float = 0
 
  /// Current algorithm index (0..<32).
- @Published var algorithmIndex: Int = 0 {
- didSet { saveSettings() }
- }
+ @Published var algorithmIndex: Int = 0
 
  /// Feedback level (0...1) for algorithms that use feedback.
- @Published var feedbackLevel: Float = 0.5 {
- didSet { saveSettings() }
- }
+ @Published var feedbackLevel: Float = 0.5
 
  /// Oscillator sync enabled.
- @Published var oscillatorSync: Bool = false {
- didSet { saveSettings() }
- }
+ @Published var oscillatorSync: Bool = false
 
  /// LFO rate in Hz (0.01...20).
- @Published var lfoRate: Float = 5.0 {
- didSet { saveSettings() }
- }
+ @Published var lfoRate: Float = 5.0
 
  /// LFO waveform.
- @Published var lfoWave: LFOWave = .sine {
- didSet { saveSettings() }
- }
+ @Published var lfoWave: LFOWave = .sine
 
  /// Pitch bend range in semitones (0...24).
- @Published var pitchBendRange: Float = 2.0 {
- didSet { saveSettings() }
- }
+ @Published var pitchBendRange: Float = 2.0
 
  /// Pitch bend value (-1...1). -1 = down range, +1 = up range, 0 = center.
- @Published var pitchBendValue: Float = 0.0 {
- didSet { saveSettings() }
- }
+ @Published var pitchBendValue: Float = 0.0
 
  /// Per-operator parameters, indexed by operator (0..<6).
  /// Each entry: (ratio, detune, level, attack, decay, sustain, release).
@@ -103,65 +87,61 @@ final class SynthEngine: ObservableObject {
  (4.0, 0, 0.4, 0.1, 0.1, 0.5, 0.5), // Operator 4
  (5.0, 0, 0.3, 0.1, 0.1, 0.5, 0.5), // Operator 5
  (6.0, 0, 0.2, 0.1, 0.1, 0.5, 0.5), // Operator 6
- ] {
- didSet { saveSettings() }
- }
+ ]
 
  /// Per-operator on/off state.
- @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6) {
- didSet { saveSettings() }
- }
+ @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6)
 
  /// Effects chain (filter → distortion → chorus → delay → reverb → phaser).
  let effects: EffectsChain
 
  /// Effect enabled states.
  @Published var effectFilterEnabled: Bool = false {
- didSet { effects.setEnabled(.filter, enabled: effectFilterEnabled); saveSettings() }
+ didSet { effects.setEnabled(.filter, enabled: effectFilterEnabled) }
  }
  @Published var effectDistortionEnabled: Bool = false {
- didSet { effects.setEnabled(.distortion, enabled: effectDistortionEnabled); saveSettings() }
+ didSet { effects.setEnabled(.distortion, enabled: effectDistortionEnabled) }
  }
  @Published var effectChorusEnabled: Bool = false {
- didSet { effects.setEnabled(.chorus, enabled: effectChorusEnabled); saveSettings() }
+ didSet { effects.setEnabled(.chorus, enabled: effectChorusEnabled) }
  }
  @Published var effectDelayEnabled: Bool = false {
- didSet { effects.setEnabled(.delay, enabled: effectDelayEnabled); saveSettings() }
+ didSet { effects.setEnabled(.delay, enabled: effectDelayEnabled) }
  }
  @Published var effectReverbEnabled: Bool = false {
- didSet { effects.setEnabled(.reverb, enabled: effectReverbEnabled); saveSettings() }
+ didSet { effects.setEnabled(.reverb, enabled: effectReverbEnabled) }
  }
  @Published var effectPhaserEnabled: Bool = false {
- didSet { effects.setEnabled(.phaser, enabled: effectPhaserEnabled); saveSettings() }
+ didSet { effects.setEnabled(.phaser, enabled: effectPhaserEnabled) }
  }
 
  /// Effect amounts (wet/dry mix, 0...1).
  @Published var effectFilterAmount: Float = 0.5 {
- didSet { effects.setAmount(.filter, amount: effectFilterAmount); saveSettings() }
+ didSet { effects.setAmount(.filter, amount: effectFilterAmount) }
  }
  @Published var effectDistortionAmount: Float = 0.5 {
- didSet { effects.setAmount(.distortion, amount: effectDistortionAmount); saveSettings() }
+ didSet { effects.setAmount(.distortion, amount: effectDistortionAmount) }
  }
  @Published var effectChorusAmount: Float = 0.5 {
- didSet { effects.setAmount(.chorus, amount: effectChorusAmount); saveSettings() }
+ didSet { effects.setAmount(.chorus, amount: effectChorusAmount) }
  }
  @Published var effectDelayAmount: Float = 0.5 {
- didSet { effects.setAmount(.delay, amount: effectDelayAmount); saveSettings() }
+ didSet { effects.setAmount(.delay, amount: effectDelayAmount) }
  }
  @Published var effectReverbAmount: Float = 0.5 {
- didSet { effects.setAmount(.reverb, amount: effectReverbAmount); saveSettings() }
+ didSet { effects.setAmount(.reverb, amount: effectReverbAmount) }
  }
  @Published var effectPhaserAmount: Float = 0.5 {
- didSet { effects.setAmount(.phaser, amount: effectPhaserAmount); saveSettings() }
+ didSet { effects.setAmount(.phaser, amount: effectPhaserAmount) }
  }
 
  /// Filter cutoff frequency (Hz).
  @Published var effectFilterCutoff: Float = 5000 {
- didSet { effects.setFilterCutoff(effectFilterCutoff); saveSettings() }
+ didSet { effects.setFilterCutoff(effectFilterCutoff) }
  }
  /// Filter resonance (Q).
  @Published var effectFilterResonance: Float = 1.0 {
- didSet { effects.setFilterResonance(effectFilterResonance); saveSettings() }
+ didSet { effects.setFilterResonance(effectFilterResonance) }
  }
 
  /// Arpeggiator.
@@ -217,9 +197,6 @@ final class SynthEngine: ObservableObject {
 
  // Initial volume.
  mainMixer.outputVolume = volume
-
- // Load saved settings.
- loadSettings()
  }
 
  deinit {
@@ -496,12 +473,21 @@ final class SynthEngine: ObservableObject {
  sequencer.steps = preset.sequencerSteps
  }
 
- // MARK: - Settings persistence
+ // MARK: - Settings persistence (Application Support)
 
- private let settingsKey = "SynthEngineSettings"
+ private let settingsFileName = "SynthEngineSettings.json"
 
- /// Saves all engine parameters to UserDefaults.
+ private var settingsFileURL: URL? {
+ FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)
+ .first?.appendingPathComponent("charlyjazz.Synthesizer", isDirectory: true)
+ .appendingPathComponent(settingsFileName)
+ }
+
+ /// Saves all engine parameters to a JSON file in Application Support.
+ /// Called on app quit to preserve the current state.
  func saveSettings() {
+ guard let url = settingsFileURL else { return }
+
  var dict: [String: Any] = [:]
 
  // Global parameters
@@ -560,12 +546,27 @@ final class SynthEngine: ObservableObject {
  }
  dict["sequencerSteps"] = seqSteps
 
- UserDefaults.standard.set(dict, forKey: settingsKey)
+ do {
+ let data = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+ try? FileManager.default.createDirectory(
+ at: url.deletingLastPathComponent(),
+ withIntermediateDirectories: true
+ )
+ try data.write(to: url, options: .atomic)
+ } catch {
+ print("Failed to save settings: \(error)")
+ }
  }
 
- /// Loads engine parameters from UserDefaults.
- private func loadSettings() {
- guard let dict = UserDefaults.standard.dictionary(forKey: settingsKey) else { return }
+ /// Loads engine parameters from the JSON file in Application Support.
+ /// Call this when the user wants to restore the last saved state.
+ func loadSettings() {
+ guard let url = settingsFileURL,
+ FileManager.default.fileExists(atPath: url.path) else { return }
+
+ do {
+ let data = try Data(contentsOf: url)
+ guard let dict = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
 
  // Global parameters
  if let v = dict["volume"] as? Float { volume = v }
@@ -630,6 +631,9 @@ final class SynthEngine: ObservableObject {
  if let gate = stepDict["gate"] as? Float { step.gate = gate }
  sequencer.steps[index] = step
  }
+ }
+ } catch {
+ print("Failed to load settings: \(error)")
  }
  }
 }

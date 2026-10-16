@@ -75,6 +75,13 @@ struct ContentView: View {
  Text(midiManager.isConnected ? "Connected" : "Disconnected")
  .font(.caption2)
  .foregroundColor(midiManager.isConnected ? .green : .secondary)
+ 
+ Button("Restore Last State") {
+ engine.loadSettings()
+ }
+ .buttonStyle(.bordered)
+ .controlSize(.small)
+ .help("Restore previously saved engine state")
  }
 
  // MARK: Arpeggiator + Sequencer
