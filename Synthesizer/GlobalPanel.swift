@@ -53,26 +53,22 @@ struct GlobalPanel: View {
 
  VStack(spacing: 16) {
  // Transpose
- LabeledSlider(
+ Knob(
  title: "Transpose",
  value: $engine.transpose,
  range: -24...24,
  step: 1,
- unit: " st",
  formatter: { String(format: "%.0f", $0) }
  )
- .frame(maxWidth: .infinity)
 
  // Pitch bend range
- LabeledSlider(
+ Knob(
  title: "Bend Range",
  value: $engine.pitchBendRange,
  range: 0...24,
  step: 1,
- unit: " st",
  formatter: { String(format: "%.0f", $0) }
  )
- .frame(maxWidth: .infinity)
  }
 
  HStack(spacing: 16) {
@@ -92,15 +88,13 @@ struct GlobalPanel: View {
 
  HStack(spacing: 16) {
  // LFO rate
- LabeledSlider(
+ Knob(
  title: "LFO Rate",
  value: $engine.lfoRate,
  range: 0.01...20,
  step: 0.01,
- unit: " Hz",
  formatter: { String(format: "%.2f", $0) }
  )
- .frame(maxWidth: .infinity)
 
  // LFO wave
  Picker("LFO Wave", selection: $engine.lfoWave) {
