@@ -85,7 +85,7 @@ struct KeyboardView: View {
  }
 
  var body: some View {
- ZStack(alignment: .topLeading) {
+ ZStack(alignment: .top) {
  // Bottom layer: white keys evenly spaced
  HStack(spacing: 0) {
  ForEach(whiteKeys, id: \.self) { code in
@@ -98,19 +98,21 @@ struct KeyboardView: View {
  }
  }
  .frame(height: keyboardWhiteKeyHeight)
-
+ 
+ HStack(spacing: 0) {
  // Top layer: black keys overlaid at correct positions
- ForEach(blackKeys, id: \.self) { code in
+ ForEach(Array(blackKeys.enumerated()), id: \.element) { index, code in
  BlackKeyView(
  midiCode: code,
  isActive: activeNotes.contains(code),
  onDown: { onKeyDown?(code) },
  onUp: { onKeyUp?(code) }
  )
- .position(
- x: blackKeyXOffset(midiCode: Int(code)) + keyboardBlackKeyWidth / 2,
- y: keyboardBlackKeyHeight / 2
+ .offset(
+ x: blackKeyXOffset(midiCode: Int(code)) - CGFloat(index) * keyboardBlackKeyWidth,
+ y: -(keyboardWhiteKeyHeight - keyboardBlackKeyHeight) / 2
  )
+ }
  }
  .frame(height: keyboardWhiteKeyHeight)
  }
