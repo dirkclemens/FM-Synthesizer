@@ -388,7 +388,7 @@ These are **note generators** — they create note on/off events that drive the 
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.1 | 2026-10-16 | Removed all brand references (, ) from manual and plan files; renamed to generic "6-Operator FM Synthesizer" |
+| 1.1 | 2026-10-16 | Removed all brand references from manual and plan files; renamed to generic "6-Operator FM Synthesizer" |
 | 1.0 | 2026-10-16 | Initial manual covering Steps 0–7 (FM engine, modulation, effects, UI, presets, arpeggiator, sequencer, CoreMIDI, Mac keyboard) |
 
 ---
