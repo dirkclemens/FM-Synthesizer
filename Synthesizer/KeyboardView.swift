@@ -2,7 +2,8 @@
 // KeyboardView.swift
 // Synthesizer
 //
-// A 27-key piano keyboard (MIDI 36–62) with visual note-on highlighting.
+// A 27-key piano keyboard (MIDI 36–62) with real piano layout:
+// white keys evenly spaced, black keys overlaid in 2-key and 3-key groups.
 //
 
 import SwiftUI
@@ -15,22 +16,54 @@ let keyboardBlackKeyHeight: CGFloat = 75
 /// MIDI note range for the 27-key keyboard.
 let keyboardNoteRange: ClosedRange<UInt8> = 36...62
 
+/// Whether a MIDI note is a white key.
 func isWhiteKey(midiCode: Int) -> Bool {
  let k = midiCode % 12
  return (k == 0 || k == 2 || k == 4 || k == 5 || k == 7 || k == 9 || k == 11)
 }
 
-/// Returns the x-offset for a white key, based on how many white keys precede it.
-func whiteKeyXOffset(midiCode: Int) -> CGFloat {
- let whiteKeysBefore = (36...midiCode).filter { isWhiteKey(midiCode: $0) }
- return CGFloat(whiteKeysBefore.count - 1) * keyboardWhiteKeyWidth
+/// Maps a MIDI note to its white-key index within the keyboard.
+/// White keys within an octave: C=0, D=1, E=2, F=3, G=4, A=5, B=6
+private let whiteKeyIndexInOctave: [Int: Int] = [
+ 0: 0, // C
+ 2: 1, // D
+ 4: 2, // E
+ 5: 3, // F
+ 7: 4, // G
+ 9: 5, // A
+ 11: 6, // B
+]
+
+/// Returns the zero-based index of a white key across the whole keyboard.
+func whiteKeyIndex(midiCode: Int) -> Int {
+ let octave = midiCode / 12
+ let noteInOctave = midiCode % 12
+ guard let indexInOctave = whiteKeyIndexInOctave[noteInOctave] else { return 0 }
+ return octave * 7 + indexInOctave
 }
 
-/// Returns the x-offset for a black key, positioned just right of its lower white key.
+/// Returns the x-position of a white key.
+func whiteKeyXOffset(midiCode: Int) -> CGFloat {
+ return CGFloat(whiteKeyIndex(midiCode: midiCode)) * keyboardWhiteKeyWidth
+}
+
+/// Returns the x-offset for a black key, centered on the boundary to the right
+/// of its lower white key (e.g. C# sits between C and D).
+/// Black keys exist for: C#(1), D#(3), F#(6), G#(8), A#(10)
+private let blackKeyLeftWhiteNote: [Int: Int] = [
+ 1: 0, // C# → C is to the left
+ 3: 2, // D# → D is to the left
+ 6: 5, // F# → F is to the left
+ 8: 7, // G# → G is to the left
+ 10: 9, // A# → A is to the left
+]
+
 func blackKeyXOffset(midiCode: Int) -> CGFloat {
- let lowerWhite = midiCode - 1
- let lowerWhiteX = whiteKeyXOffset(midiCode: lowerWhite)
- return lowerWhiteX + keyboardWhiteKeyWidth - keyboardBlackKeyWidth / 2
+ let noteInOctave = midiCode % 12
+ guard let leftWhiteNote = blackKeyLeftWhiteNote[noteInOctave] else { return 0 }
+ let leftWhiteMidi = (midiCode / 12) * 12 + leftWhiteNote
+ let leftWhiteX = whiteKeyXOffset(midiCode: leftWhiteMidi)
+ return leftWhiteX + keyboardWhiteKeyWidth - keyboardBlackKeyWidth / 2
 }
 
 struct KeyboardView: View {
@@ -39,28 +72,8 @@ struct KeyboardView: View {
  var activeNotes: Set<UInt8> = []
 
  var body: some View {
- VStack(spacing: 0) {
- // Black keys layer (top)
- HStack(spacing: 0) {
- ForEach(Array(keyboardNoteRange), id: \.self) { code in
- if !isWhiteKey(midiCode: Int(code)) {
- BlackKeyView(
- midiCode: code,
- isActive: activeNotes.contains(code),
- onDown: { onKeyDown?(code) },
- onUp: { onKeyUp?(code) }
- )
- .offset(x: blackKeyXOffset(midiCode: Int(code)))
- } else {
- // Placeholder to maintain horizontal spacing
- Color.clear
- .frame(width: keyboardWhiteKeyWidth)
- }
- }
- }
- .frame(height: keyboardBlackKeyHeight)
-
- // White keys layer (bottom)
+ ZStack(alignment: .topLeading) {
+ // Bottom layer: white keys evenly spaced
  HStack(spacing: 1) {
  ForEach(Array(keyboardNoteRange), id: \.self) { code in
  if isWhiteKey(midiCode: Int(code)) {
@@ -76,7 +89,22 @@ struct KeyboardView: View {
  }
  }
  .frame(height: keyboardWhiteKeyHeight)
+
+ // Top layer: black keys overlaid at correct positions
+ ForEach(Array(keyboardNoteRange), id: \.self) { code in
+ if !isWhiteKey(midiCode: Int(code)) {
+ BlackKeyView(
+ midiCode: code,
+ isActive: activeNotes.contains(code),
+ onDown: { onKeyDown?(code) },
+ onUp: { onKeyUp?(code) }
+ )
+ .position(x: blackKeyXOffset(midiCode: Int(code)) + keyboardBlackKeyWidth / 2,
+ y: keyboardBlackKeyHeight / 2)
  }
+ }
+ }
+ .frame(height: keyboardWhiteKeyHeight)
  }
 }
 
