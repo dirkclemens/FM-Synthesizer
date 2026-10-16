@@ -154,7 +154,7 @@ struct OperatorPanel: View {
  }
 
  private var operatorColor: Color {
- let colors: [Color] = [.cyan, .purple, .magenta, .blue, .green, .orange]
+ let colors: [Color] = [.cyan, .purple, .indigo, .blue, .green, .orange]
  return colors[operatorIndex % colors.count]
  }
 
