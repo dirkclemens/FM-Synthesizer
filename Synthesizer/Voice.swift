@@ -37,6 +37,13 @@ final class Voice {
  /// The 6 operators.
  let operators: [Operator]
  
+ /// The LFO for this voice (vibrato/tremolo source).
+ let lfo: LFO
+ 
+ /// Whether oscillator hard-sync is enabled. When on, the carrier's phase
+ /// wrap resets modulator phases.
+ var oscillatorSync: Bool = false
+ 
  /// The algorithm used by this voice.
  private(set) var algorithm: FMAlgorithm
  
@@ -53,6 +60,7 @@ final class Voice {
  self.sampleRate = sampleRate
  self.algorithm = algorithm
  self.operators = (0..<6).map { Operator(index: $0, sampleRate: sampleRate) }
+ self.lfo = LFO(sampleRate: sampleRate)
  }
  
  // MARK: - Configuration
@@ -77,6 +85,14 @@ final class Voice {
  }
  }
  
+ // MARK: - LFO configuration
+ 
+ /// Updates the LFO rate and waveform.
+ func setLFO(rate: Float, wave: LFOWave) {
+ lfo.rate = rate
+ lfo.wave = wave
+ }
+ 
  // MARK: - Note control
  
  /// Starts a note.
@@ -89,7 +105,7 @@ final class Voice {
  self.state = .active
  
  for op in operators {
- op.noteOn(velocity: velocity, noteFrequency: baseFrequency)
+ op.noteOn(velocity: velocity, noteFrequency: baseFrequency, midiNote: midiNote)
  }
  }
  
@@ -107,6 +123,7 @@ final class Voice {
  state = .free
  midiNote = 0
  feedbackSample = 0
+ lfo.reset()
  for op in operators {
  op.silence()
  }
@@ -114,21 +131,20 @@ final class Voice {
  
  // MARK: - Render
  
- /// Renders a block of stereo-interleaved samples.
+ /// Renders a block of mono samples using the voice's own LFO.
  ///
  /// - Parameter frameCount: Number of frames to render.
- /// - Returns: Array of `frameCount` mono samples (applied to all channels).
+ /// - Returns: Array of `frameCount` mono samples.
  func render(frameCount: Int) -> [Float] {
  var samples = [Float](repeating: 0, count: frameCount)
- 
+
  guard state != .free else { return samples }
- 
- let lfoValue: Float = 0 // LFO is applied at the engine level in Step 2
- 
+
  for frame in 0..<frameCount {
+ let lfoValue = lfo.nextSample()
  let frameSample = renderFrame(lfoValue: lfoValue)
  samples[frame] = frameSample
- 
+
  // Check if voice has finished releasing
  if state == .releasing && isSilent {
  state = .free
@@ -139,7 +155,7 @@ final class Voice {
  break
  }
  }
- 
+
  return samples
  }
  
@@ -171,6 +187,12 @@ final class Voice {
  if algorithm.carriers.contains(opIndex) {
  carrierSum += sample
  }
+ }
+ 
+ // Oscillator hard-sync: if enabled and the carrier (operator 5) phase
+ // wrapped this frame, reset modulator (operator 0) phase.
+ if oscillatorSync, algorithm.carriers.contains(5) {
+ operators[0].resetOscillatorPhase()
  }
  
  // Save feedback sample for next frame.

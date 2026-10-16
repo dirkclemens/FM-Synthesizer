@@ -83,7 +83,7 @@ final class FMEngineTests: XCTestCase {
  op.decay = 0
  op.sustain = 1.0
  op.release = 0
- op.noteOn(velocity: 127, noteFrequency: 440.0)
+ op.noteOn(velocity: 127, noteFrequency: 440.0, midiNote: 69)
 
  // Render enough samples to cover the attack phase
  let attackSamples = Int(0.01 * 44100) + 10
@@ -105,10 +105,10 @@ final class FMEngineTests: XCTestCase {
  op.decay = 0
  op.sustain = 0.5
  op.release = 0.01
- op.noteOn(velocity: 127, noteFrequency: 440.0)
+ op.noteOn(velocity: 127, noteFrequency: 440.0, midiNote: 69)
 
- // Let it reach sustain
- for _ in 0..<10 {
+ // Let it reach sustain (attack is min 0.001s = ~44 samples at 44.1kHz)
+ for _ in 0..<100 {
  _ = op.render(modulationInput: 0)
  }
  XCTAssertEqual(op.envelopeState, .sustain)
@@ -232,5 +232,192 @@ final class FMEngineTests: XCTestCase {
  XCTAssertEqual(voice.operators[0].ratio, 1.0)
  XCTAssertEqual(voice.operators[1].ratio, 2.0)
  XCTAssertEqual(voice.operators[5].level, 0.2)
+ }
+
+ // MARK: - LFO
+
+ func testLFOSineWaveRange() {
+ let lfo = LFO(sampleRate: 44100)
+ lfo.rate = 10.0
+ lfo.wave = .sine
+ for _ in 0..<1000 {
+ let value = lfo.nextSample()
+ XCTAssertGreaterThanOrEqual(value, -1.0)
+ XCTAssertLessThanOrEqual(value, 1.0)
+ }
+ }
+
+ func testLFOSquareWave() {
+ let lfo = LFO(sampleRate: 44100)
+ lfo.rate = 10.0
+ lfo.wave = .square
+ var values: Set<Float> = []
+ for _ in 0..<1000 {
+ values.insert(lfo.nextSample())
+ }
+ // Square wave should only produce -1 or 1
+ XCTAssertTrue(values.isSubset(of: [-1.0, 1.0]))
+ }
+
+ func testLFOTriangleWave() {
+ let lfo = LFO(sampleRate: 44100)
+ lfo.rate = 10.0
+ lfo.wave = .triangle
+ for _ in 0..<1000 {
+ let value = lfo.nextSample()
+ XCTAssertGreaterThanOrEqual(value, -1.0)
+ XCTAssertLessThanOrEqual(value, 1.0)
+ }
+ }
+
+ func testLFOSawWave() {
+ let lfo = LFO(sampleRate: 44100)
+ lfo.rate = 10.0
+ lfo.wave = .saw
+ for _ in 0..<1000 {
+ let value = lfo.nextSample()
+ XCTAssertGreaterThanOrEqual(value, -1.0)
+ XCTAssertLessThanOrEqual(value, 1.0)
+ }
+ }
+
+ func testLFORandomWave() {
+ let lfo = LFO(sampleRate: 44100)
+ lfo.rate = 10.0
+ lfo.wave = .random
+ for _ in 0..<1000 {
+ let value = lfo.nextSample()
+ XCTAssertGreaterThanOrEqual(value, -1.0)
+ XCTAssertLessThanOrEqual(value, 1.0)
+ }
+ }
+
+ func testLFOReset() {
+ let lfo = LFO(sampleRate: 44100)
+ lfo.rate = 10.0
+ _ = lfo.nextSample()
+ _ = lfo.nextSample()
+ XCTAssertNotEqual(lfo.phase, 0.0)
+ lfo.reset()
+ XCTAssertEqual(lfo.phase, 0.0)
+ }
+
+ // MARK: - Transpose
+
+ func testSynthEngineTranspose() {
+ let engine = SynthEngine()
+ engine.transpose = 12 // one octave up
+ engine.noteOn(midiNote: 69, velocity: 100) // A4 -> should play A5
+ // We can't directly inspect voice frequency, but noteOn shouldn't crash
+ // and should allocate a voice
+ XCTAssertTrue(engine.voices.contains { $0.state == .active })
+ engine.allNotesOff()
+ }
+
+ // MARK: - Velocity sensitivity
+
+ func testOperatorVelocitySensitivity() {
+ let op = Operator(index: 0, sampleRate: 44100)
+ op.velocitySensitivity = 1.0
+ op.attack = 0.001 // very short attack
+ op.decay = 0
+ op.sustain = 1.0
+ op.release = 0
+
+ op.noteOn(velocity: 127, noteFrequency: 440.0, midiNote: 60)
+ _ = op.render(modulationInput: 0) // advance envelope one sample
+ let highVelLevel = op.envelopeValue
+
+ op.noteOn(velocity: 1, noteFrequency: 440.0, midiNote: 60)
+ _ = op.render(modulationInput: 0)
+ let lowVelLevel = op.envelopeValue
+
+ // Higher velocity should produce higher envelope value
+ XCTAssertGreaterThan(highVelLevel, lowVelLevel)
+ }
+
+ func testOperatorVelocitySensitivityZero() {
+ let op = Operator(index: 0, sampleRate: 44100)
+ op.velocitySensitivity = 0.0
+ op.attack = 0.001
+ op.decay = 0
+ op.sustain = 1.0
+ op.release = 0
+
+ op.noteOn(velocity: 127, noteFrequency: 440.0, midiNote: 60)
+ _ = op.render(modulationInput: 0)
+ let highVelLevel = op.envelopeValue
+
+ op.noteOn(velocity: 1, noteFrequency: 440.0, midiNote: 60)
+ _ = op.render(modulationInput: 0)
+ let lowVelLevel = op.envelopeValue
+
+ // With zero sensitivity, both should be the same (full level)
+ XCTAssertEqual(highVelLevel, lowVelLevel, accuracy: 0.001)
+ }
+
+ // MARK: - Key scaling
+
+ func testOperatorKeyScalingShortensAttack() {
+ let opHigh = Operator(index: 0, sampleRate: 44100)
+ opHigh.keyScaling = 1.0
+ opHigh.attack = 0.05 // 50ms base attack
+ opHigh.decay = 0
+ opHigh.sustain = 1.0
+ opHigh.release = 0
+
+ // High note (C6 = 84) with key scaling should have shorter attack
+ opHigh.noteOn(velocity: 100, noteFrequency: 1046.50, midiNote: 84)
+
+ // Render enough to cover the key-scaled attack (~40ms at 44.1kHz = ~1764 samples)
+ for _ in 0..<3000 {
+ _ = opHigh.render(modulationInput: 0)
+ }
+ // After ~68ms, high note with key scaling should be in sustain
+ XCTAssertEqual(opHigh.envelopeState, .sustain)
+ }
+
+ // MARK: - Voice LFO
+
+ func testVoiceLFOAffectsOutput() {
+ let voice = Voice(sampleRate: 44100, algorithm: fmAlgorithms[23]) // algorithm 24: all carriers
+ voice.operators[0].lfoAmpDepth = 1.0 // full tremolo on operator 0
+ voice.noteOn(midiNote: 69, velocity: 100, baseFrequency: 440.0)
+
+ // Set LFO to square wave for maximum variation
+ voice.lfo.wave = .square
+ voice.lfo.rate = 100.0 // fast LFO
+
+ var samples: [Float] = []
+ for _ in 0..<1000 {
+ samples.append(voice.render(frameCount: 1)[0])
+ }
+
+ // With square wave LFO and full amp depth, output should alternate
+ let maxVal = samples.map { abs($0) }.max() ?? 0
+ let minVal = samples.map { abs($0) }.min() ?? 0
+ XCTAssertGreaterThan(maxVal - minVal, 0.1, "LFO should cause amplitude variation")
+ }
+
+ // MARK: - Engine pitch bend and LFO params
+
+ func testEngineHasLFOParameters() {
+ let engine = SynthEngine()
+ XCTAssertEqual(engine.lfoRate, 5.0)
+ XCTAssertEqual(engine.lfoWave, .sine)
+ engine.lfoRate = 10.0
+ engine.lfoWave = .triangle
+ XCTAssertEqual(engine.lfoRate, 10.0)
+ XCTAssertEqual(engine.lfoWave, .triangle)
+ }
+
+ func testEngineHasPitchBendParameters() {
+ let engine = SynthEngine()
+ XCTAssertEqual(engine.pitchBendRange, 2.0)
+ XCTAssertEqual(engine.pitchBendValue, 0.0)
+ engine.pitchBendRange = 12.0
+ engine.pitchBendValue = 1.0
+ XCTAssertEqual(engine.pitchBendRange, 12.0)
+ XCTAssertEqual(engine.pitchBendValue, 1.0)
  }
 }

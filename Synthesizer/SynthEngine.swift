@@ -38,8 +38,8 @@ final class SynthEngine: ObservableObject {
  /// One source node per voice.
  private var voiceNodes: [AVAudioSourceNode] = []
 
- /// The voices.
- private var voices: [Voice] = []
+ /// The voices (internal for testing).
+ var voices: [Voice] = []
 
  /// Whether the engine is running.
  private(set) var isRunning: Bool = false
@@ -51,10 +51,7 @@ final class SynthEngine: ObservableObject {
 
  /// Master volume (0...1).
  @Published var volume: Float = 0.5 {
- didSet {
- // AVAudioEngine calls must be on the main thread; UI updates are on main.
- mainMixer.outputVolume = volume
- }
+ didSet { mainMixer.outputVolume = volume }
  }
 
  /// Global transpose in semitones (-24...+24).
@@ -68,6 +65,18 @@ final class SynthEngine: ObservableObject {
 
  /// Oscillator sync enabled.
  @Published var oscillatorSync: Bool = false
+
+ /// LFO rate in Hz (0.01...20).
+ @Published var lfoRate: Float = 5.0
+
+ /// LFO waveform.
+ @Published var lfoWave: LFOWave = .sine
+
+ /// Pitch bend range in semitones (0...24).
+ @Published var pitchBendRange: Float = 2.0
+
+ /// Pitch bend value (-1...1). -1 = down range, +1 = up range, 0 = center.
+ @Published var pitchBendValue: Float = 0.0
 
  /// Per-operator parameters, indexed by operator (0..<6).
  /// Each entry: (ratio, detune, level, attack, decay, sustain, release).
@@ -145,6 +154,10 @@ final class SynthEngine: ObservableObject {
  algorithmIndex: self.algorithmIndex,
  feedbackLevel: self.feedbackLevel,
  oscillatorSync: self.oscillatorSync,
+ lfoRate: self.lfoRate,
+ lfoWave: self.lfoWave,
+ pitchBendRange: self.pitchBendRange,
+ pitchBendValue: self.pitchBendValue,
  operatorParams: self.operatorParams
  )
  }
@@ -155,6 +168,11 @@ final class SynthEngine: ObservableObject {
  voice.setAlgorithm(fmAlgorithms[params.algorithmIndex])
  voice.configureOperators(params.operatorParams)
 
+ // Apply global modulation controls.
+ voice.oscillatorSync = params.oscillatorSync
+ voice.setLFO(rate: params.lfoRate, wave: params.lfoWave)
+
+ // Render samples using the voice's own LFO.
  let samples = voice.render(frameCount: frameCount)
 
  for frame in 0..<frameCount {
@@ -177,9 +195,12 @@ final class SynthEngine: ObservableObject {
  func noteOn(midiNote: UInt8, velocity: Float) {
  guard midiNoteRange.contains(midiNote) else { return }
 
- // Apply transpose.
+ // Apply transpose and pitch bend.
  let transposeSemitones = Int(clamp(transpose, -24, 24))
- let transposedNote = midiNote + UInt8(clamp(Int(midiNote) + transposeSemitones, 21, 108))
+ let bendSemitones = pitchBendValue * pitchBendRange
+ let transposedNoteFloat = Float(midiNote) + Float(transposeSemitones) + bendSemitones
+ let clampedNote = max(21, min(108, Int(transposedNoteFloat.rounded())))
+ let transposedNote = UInt8(clampedNote)
  let baseFreq = midiNoteToFreq(midiNumber: transposedNote)
 
  paramLock.sync {

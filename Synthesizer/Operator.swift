@@ -54,6 +54,12 @@ final class Operator {
  /// Output level (0...1).
  var level: Float = 1.0
  
+ /// Key scaling amount (0...1). Higher notes get shorter attack / lower level when > 0.
+ var keyScaling: Float = 0.0
+ 
+ /// Velocity sensitivity (0...1). How much note velocity affects operator level.
+ var velocitySensitivity: Float = 1.0
+ 
  // MARK: - Modulation
  
  /// How much LFO affects this operator's pitch (vibrato), 0...1.
@@ -107,7 +113,7 @@ final class Operator {
  // MARK: - Note control
  
  /// Starts the note: resets phase and begins the attack phase.
- func noteOn(velocity: Float, noteFrequency: Float) {
+ func noteOn(velocity: Float, noteFrequency: Float, midiNote: UInt8) {
  // Compute base frequency
  let baseFreq: Float
  switch frequencyMode {
@@ -121,13 +127,17 @@ final class Operator {
  oscillator.frequency = baseFreq
  oscillator.resetPhase()
  
- // Velocity scales the initial level (0...127 -> 0...1)
- let velFactor = velocity / 127.0
+ // Velocity scales the initial level, moderated by velocitySensitivity (0...1)
+ let velFactor = 1.0 - velocitySensitivity + (velocity / 127.0) * velocitySensitivity
+ 
+ // Key scaling: higher notes get shorter attack and slightly lower level
+ let keyScaleFactor = 1.0 - (Float(midiNote) - 60.0) / 127.0 * keyScaling
+ let scaledAttack = max(0.001, attack * keyScaleFactor)
  
  envelopeTime = 0
  envelopeState = .attack
- // Store velocity for use in envelope scaling
  _velocity = velFactor
+ _keyScaleAttack = scaledAttack
  }
  
  /// Starts the release phase. The note will fade out over `release` seconds.
@@ -136,11 +146,16 @@ final class Operator {
  envelopeState = .release
  envelopeTime = 0
  }
- 
+
  /// Forces the envelope to off immediately (for voice stealing).
  func silence() {
  envelopeState = .off
  envelopeValue = 0
+ }
+
+ /// Resets the oscillator phase to zero (for oscillator sync).
+ func resetOscillatorPhase() {
+ oscillator.resetPhase()
  }
  
  // MARK: - Render
@@ -185,12 +200,12 @@ final class Operator {
  
  case .attack:
  envelopeTime += dt
- if attack > 0 {
- envelopeValue = min(envelopeTime / attack, 1.0) * _velocity
+ if _keyScaleAttack > 0 {
+ envelopeValue = min(envelopeTime / _keyScaleAttack, 1.0) * _velocity
  } else {
  envelopeValue = _velocity
  }
- if envelopeTime >= attack {
+ if envelopeTime >= _keyScaleAttack {
  envelopeState = .decay
  envelopeTime = 0
  }
@@ -229,4 +244,7 @@ final class Operator {
  
  /// Velocity scaling factor (0...1), set on noteOn.
  private var _velocity: Float = 1.0
+ 
+ /// Attack time adjusted for key scaling, set on noteOn.
+ private var _keyScaleAttack: Float = 0.1
 }
