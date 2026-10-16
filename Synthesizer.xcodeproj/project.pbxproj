@@ -34,6 +34,7 @@
 		FD66868B2968E70000FD8C4A /* Preset.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66868A2968E70000FD8C4A /* Preset.swift */; };
 		FD66868D2968E70000FD8C4A /* PresetBank.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66868C2968E70000FD8C4A /* PresetBank.swift */; };
 		FD66868F2968E70000FD8C4A /* PresetBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66868E2968E70000FD8C4A /* PresetBrowserView.swift */; };
+		FD6686912968E70000FD8C4A /* Effects.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686902968E70000FD8C4A /* Effects.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -84,6 +85,7 @@
 		FD66868A2968E70000FD8C4A /* Preset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preset.swift; sourceTree = "<group>"; };
 		FD66868C2968E70000FD8C4A /* PresetBank.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetBank.swift; sourceTree = "<group>"; };
 		FD66868E2968E70000FD8C4A /* PresetBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetBrowserView.swift; sourceTree = "<group>"; };
+		FD6686902968E70000FD8C4A /* Effects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Effects.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -151,6 +153,7 @@
 				FD66868A2968E70000FD8C4A /* Preset.swift */,
 				FD66868C2968E70000FD8C4A /* PresetBank.swift */,
 				FD66868E2968E70000FD8C4A /* PresetBrowserView.swift */,
+				FD6686902968E70000FD8C4A /* Effects.swift */,
 				FD1F702229A7DD8800B2D690 /* Keyboard.swift */,
 			);
 			path = Synthesizer;
@@ -329,6 +332,7 @@
 				FD66868B2968E70000FD8C4A /* Preset.swift in Sources */,
 				FD66868D2968E70000FD8C4A /* PresetBank.swift in Sources */,
 				FD66868F2968E70000FD8C4A /* PresetBrowserView.swift in Sources */,
+				FD6686912968E70000FD8C4A /* Effects.swift in Sources */,
 			);
 		};
 		FD6686432968D8A700FD8C4A /* Sources */ = {

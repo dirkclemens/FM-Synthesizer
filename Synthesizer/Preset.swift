@@ -34,6 +34,7 @@ struct Preset: Codable, Equatable {
  var lfoRate: Float = 5.0
  var lfoWave: Int = 0 // LFOWave.rawValue
  var operators: [OperatorPreset] = Array(repeating: OperatorPreset(), count: 6)
+ var effects: [Int: EffectConfig] = [:] // EffectType.rawValue → EffectConfig
 
  init(name: String) {
  self.name = name

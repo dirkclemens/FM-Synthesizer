@@ -92,6 +92,58 @@ final class SynthEngine: ObservableObject {
  /// Per-operator on/off state.
  @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6)
 
+ /// Effects chain (filter → distortion → chorus → delay → reverb → phaser).
+ let effects: EffectsChain
+
+ /// Effect enabled states.
+ @Published var effectFilterEnabled: Bool = false {
+ didSet { effects.setEnabled(.filter, enabled: effectFilterEnabled) }
+ }
+ @Published var effectDistortionEnabled: Bool = false {
+ didSet { effects.setEnabled(.distortion, enabled: effectDistortionEnabled) }
+ }
+ @Published var effectChorusEnabled: Bool = false {
+ didSet { effects.setEnabled(.chorus, enabled: effectChorusEnabled) }
+ }
+ @Published var effectDelayEnabled: Bool = false {
+ didSet { effects.setEnabled(.delay, enabled: effectDelayEnabled) }
+ }
+ @Published var effectReverbEnabled: Bool = false {
+ didSet { effects.setEnabled(.reverb, enabled: effectReverbEnabled) }
+ }
+ @Published var effectPhaserEnabled: Bool = false {
+ didSet { effects.setEnabled(.phaser, enabled: effectPhaserEnabled) }
+ }
+
+ /// Effect amounts (wet/dry mix, 0...1).
+ @Published var effectFilterAmount: Float = 0.5 {
+ didSet { effects.setAmount(.filter, amount: effectFilterAmount) }
+ }
+ @Published var effectDistortionAmount: Float = 0.5 {
+ didSet { effects.setAmount(.distortion, amount: effectDistortionAmount) }
+ }
+ @Published var effectChorusAmount: Float = 0.5 {
+ didSet { effects.setAmount(.chorus, amount: effectChorusAmount) }
+ }
+ @Published var effectDelayAmount: Float = 0.5 {
+ didSet { effects.setAmount(.delay, amount: effectDelayAmount) }
+ }
+ @Published var effectReverbAmount: Float = 0.5 {
+ didSet { effects.setAmount(.reverb, amount: effectReverbAmount) }
+ }
+ @Published var effectPhaserAmount: Float = 0.5 {
+ didSet { effects.setAmount(.phaser, amount: effectPhaserAmount) }
+ }
+
+ /// Filter cutoff frequency (Hz).
+ @Published var effectFilterCutoff: Float = 5000 {
+ didSet { effects.setFilterCutoff(effectFilterCutoff) }
+ }
+ /// Filter resonance (Q).
+ @Published var effectFilterResonance: Float = 1.0 {
+ didSet { effects.setFilterResonance(effectFilterResonance) }
+ }
+
  /// Parameter lock for thread-safe reads on the audio thread.
  private let paramLock = ParameterLock()
 
@@ -102,6 +154,13 @@ final class SynthEngine: ObservableObject {
  mainMixer = audioEngine.mainMixerNode
  outputNode = audioEngine.outputNode
  sampleRate = outputNode.inputFormat(forBus: 0).sampleRate
+
+ // Create effects chain early (before self is used in closures).
+ effects = EffectsChain(
+ audioEngine: audioEngine,
+ inputNode: mainMixer,
+ outputNode: outputNode
+ )
 
  // Create voices.
  for i in 0..<voiceCount {
@@ -119,8 +178,13 @@ final class SynthEngine: ObservableObject {
  audioEngine.connect(node, to: mainMixer, format: nil)
  }
 
- // Connect mixer to output.
- audioEngine.connect(mainMixer, to: outputNode, format: nil)
+ // Disconnect the direct mixer→output connection;
+ // the effects chain will wire its own connections on rebuild.
+ audioEngine.disconnectNodeInput(outputNode)
+ audioEngine.disconnectNodeOutput(mainMixer)
+
+ // Build initial chain (all effects disabled = mixer → output).
+ effects.rebuildChain()
 
  // Initial volume.
  mainMixer.outputVolume = volume
@@ -312,6 +376,12 @@ final class SynthEngine: ObservableObject {
  release: params.6
  )
  }
+ // Effect states.
+ for type in EffectType.allCases {
+ if let config = effects.configs[type] {
+ p.effects[type.rawValue] = config
+ }
+ }
  return p
  }
 
@@ -338,6 +408,38 @@ final class SynthEngine: ObservableObject {
  )
  operatorIsOn[index] = op.isOn
  }
+
+ // Effect states.
+ for type in EffectType.allCases {
+ if let config = preset.effects[type.rawValue] {
+ effects.configs[type] = config
+ // Update published properties to match.
+ DispatchQueue.main.async {
+ switch type {
+ case .filter:
+ self.effectFilterEnabled = config.enabled
+ self.effectFilterAmount = config.amount
+ case .distortion:
+ self.effectDistortionEnabled = config.enabled
+ self.effectDistortionAmount = config.amount
+ case .chorus:
+ self.effectChorusEnabled = config.enabled
+ self.effectChorusAmount = config.amount
+ case .delay:
+ self.effectDelayEnabled = config.enabled
+ self.effectDelayAmount = config.amount
+ case .reverb:
+ self.effectReverbEnabled = config.enabled
+ self.effectReverbAmount = config.amount
+ case .phaser:
+ self.effectPhaserEnabled = config.enabled
+ self.effectPhaserAmount = config.amount
+ }
+ }
+ }
+ }
+ // Rebuild chain with new effect states.
+ effects.rebuildChain()
  }
  }
 }
