@@ -381,6 +381,32 @@ These are **note generators** — they create note on/off events that drive the 
 | Preset format | JSON, stored in Application Support |
 | MIDI framework | Apple CoreMIDI (native macOS) |
 | UI framework | SwiftUI |
+| State persistence | UserDefaults, auto-saves on every parameter change |
+
+---
+
+## State Persistence
+
+All synth parameters are automatically saved to your Mac's UserDefaults whenever you change them. When you quit and reopen the app, your last settings are restored:
+
+- All operator settings (ratio, detune, level, ADSR)
+- Global settings (volume, transpose, algorithm, feedback, etc.)
+- Effects settings (enabled states, amounts, filter cutoff/resonance)
+- Arpeggiator settings (mode, rate, gate, octave range)
+- Sequencer settings (tempo, all 16 steps)
+
+No manual save is required for engine settings — they persist automatically. Presets are saved separately when you click "Save" in the preset browser.
+
+---
+
+## Visual Design
+
+The UI uses a dark synthesizer aesthetic with:
+
+- **Color-coded operator panels**: Each operator (1–6) has its own color (cyan, purple, magenta, blue, green, orange) shown in the panel header and border
+- **Colored parameter knobs**: Gradient rings that fill based on value
+- **Panel borders**: Each section (Global, Arpeggiator, Sequencer, Presets) has a colored border matching its function
+- **Gradient backgrounds**: Dark gradient background across the whole window
 
 ---
 
@@ -388,6 +414,7 @@ These are **note generators** — they create note on/off events that drive the 
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2 | 2026-10-16 | Fancy UI with color-coded panels, borders, gradients; state persistence via UserDefaults; app icon SVG |
 | 1.1 | 2026-10-16 | Removed all brand references from manual and plan files; renamed to generic "6-Operator FM Synthesizer" |
 | 1.0 | 2026-10-16 | Initial manual covering Steps 0–7 (FM engine, modulation, effects, UI, presets, arpeggiator, sequencer, CoreMIDI, Mac keyboard) |
 
