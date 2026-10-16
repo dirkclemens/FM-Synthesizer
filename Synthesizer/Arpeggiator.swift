@@ -101,7 +101,7 @@ final class Arpeggiator: ObservableObject {
  // MARK: - Start / Stop
  
  func start() {
- guard !isRunning, !heldNotes.isEmpty else { return }
+ guard !isRunning else { return }
  isRunning = true
  position = 0
  direction = 1
