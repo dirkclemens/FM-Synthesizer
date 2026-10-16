@@ -2,69 +2,72 @@
 // ContentView.swift
 // Synthesizer
 //
-// Created by Carlos Azuaje on 03/01/2023.
+// Main window: FM synthesizer engine UI with keyboard, operator matrix,
+// per-operator controls, and global parameters.
 //
 
 import SwiftUI
-import Gong
 
 struct ContentView: View {
- 
- @State public var synth = Synth<any SynthProtocol>()
- @State private var observerTokens = [MIDIObserverTokens]()
- 
- func keyboardTapKeyOn(code: Int) {
- synth.attachSourceNode(midiKeyCode: UInt8(code))
- DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
- synth.detachSourceNode(midiKeyCode: UInt8(code))
- }
- }
- 
+ @StateObject private var engine = SynthEngine()
+ @State private var activeNotes: Set<UInt8> = []
+
  var body: some View {
- HStack(alignment: .center) {
- Keyboard(onTapKey: keyboardTapKeyOn)
- }.offset(x: 100)
- .padding()
- .background(Color.blue)
- .onAppear(perform: subscribe)
- .onDisappear(perform: unsubscribe)
- }
- 
-}
+ VStack(spacing: 0) {
+ // MARK: Global controls
+ GlobalPanel(engine: engine)
 
-extension ContentView {
- 
- func subscribe() {
- observerTokens.append(MIDI.addObserver(self))
- synth.volume = 0.5
- }
- 
- func unsubscribe() {
- synth.shutdownAVAudioEngine()
- for observerTokens in observerTokens {
- MIDI.removeObserver(observerTokens)
- }
- }
- 
-}
+ Divider()
 
-extension ContentView: MIDIObserver {
- 
- func receive(_ notice: MIDINotice) {
+ // MARK: Operator matrix + operator panels
+ HStack(spacing: 12) {
+ // Operator matrix (6x6 visualization)
+ OperatorMatrixView(algorithm: fmAlgorithms[engine.algorithmIndex])
+ .frame(maxWidth: .infinity)
 
+ Divider()
+
+ // Six operator panels in a scrollable row
+ ScrollView(.horizontal, showsIndicators: false) {
+ HStack(spacing: 8) {
+ ForEach(0..<6, id: \.self) { index in
+ OperatorPanel(operatorIndex: index, engine: engine)
+ .frame(width: 200)
+ }
+ }
+ .padding(.horizontal, 4)
+ }
  }
 
- func receive(_ packet: MIDIPacket, from source: MIDISource) {
- switch packet.message {
- case let .noteOn(_, key, _):
- synth.attachSourceNode(midiKeyCode: key)
- case let .noteOff(_, key, _):
- synth.detachSourceNode(midiKeyCode: key)
- default:
- break
+ Divider()
+
+ // MARK: Keyboard
+ KeyboardView(
+ onKeyDown: { note in
+ activeNotes.insert(note)
+ engine.noteOn(midiNote: note, velocity: 100)
+ },
+ onKeyUp: { note in
+ activeNotes.remove(note)
+ engine.noteOff(midiNote: note)
+ },
+ activeNotes: activeNotes
+ )
+ .padding(.bottom, 8)
+ }
+ .frame(minWidth: 900, minHeight: 600)
+ .padding(8)
+ .onAppear {
+ do {
+ try engine.start()
+ } catch {
+ print("Failed to start synth engine: \(error)")
  }
  }
- 
+ .onDisappear {
+ engine.stop()
+ }
+ }
 }
 
 struct ContentView_Previews: PreviewProvider {

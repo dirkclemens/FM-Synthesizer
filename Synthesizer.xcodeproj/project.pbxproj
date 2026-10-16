@@ -24,6 +24,13 @@
 		FD6686772968E70000FD8C4A /* SynthEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686762968E70000FD8C4A /* SynthEngine.swift */; };
 		FD6686792968E70000FD8C4A /* FMEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686782968E70000FD8C4A /* FMEngineTests.swift */; };
 		FD66867B2968E70000FD8C4A /* LFO.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66867A2968E70000FD8C4A /* LFO.swift */; };
+		FD66867D2968E70000FD8C4A /* Knob.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66867C2968E70000FD8C4A /* Knob.swift */; };
+		FD66867F2968E70000FD8C4A /* LabeledSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66867E2968E70000FD8C4A /* LabeledSlider.swift */; };
+		FD6686812968E70000FD8C4A /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686802968E70000FD8C4A /* KeyboardView.swift */; };
+		FD6686832968E70000FD8C4A /* OperatorMatrixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686822968E70000FD8C4A /* OperatorMatrixView.swift */; };
+		FD6686852968E70000FD8C4A /* AlgorithmSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */; };
+		FD6686872968E70000FD8C4A /* OperatorPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686862968E70000FD8C4A /* OperatorPanel.swift */; };
+		FD6686892968E70000FD8C4A /* GlobalPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686882968E70000FD8C4A /* GlobalPanel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,6 +71,13 @@
 		FD6686762968E70000FD8C4A /* SynthEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthEngine.swift; sourceTree = "<group>"; };
 		FD6686782968E70000FD8C4A /* FMEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMEngineTests.swift; sourceTree = "<group>"; };
 		FD66867A2968E70000FD8C4A /* LFO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LFO.swift; sourceTree = "<group>"; };
+		FD66867C2968E70000FD8C4A /* Knob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knob.swift; sourceTree = "<group>"; };
+		FD66867E2968E70000FD8C4A /* LabeledSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledSlider.swift; sourceTree = "<group>"; };
+		FD6686802968E70000FD8C4A /* KeyboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardView.swift; sourceTree = "<group>"; };
+		FD6686822968E70000FD8C4A /* OperatorMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorMatrixView.swift; sourceTree = "<group>"; };
+		FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmSelector.swift; sourceTree = "<group>"; };
+		FD6686862968E70000FD8C4A /* OperatorPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorPanel.swift; sourceTree = "<group>"; };
+		FD6686882968E70000FD8C4A /* GlobalPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalPanel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,6 +135,13 @@
 				FD6686742968E70000FD8C4A /* Algorithms.swift */,
 				FD6686762968E70000FD8C4A /* SynthEngine.swift */,
 				FD66867A2968E70000FD8C4A /* LFO.swift */,
+				FD66867C2968E70000FD8C4A /* Knob.swift */,
+				FD66867E2968E70000FD8C4A /* LabeledSlider.swift */,
+				FD6686802968E70000FD8C4A /* KeyboardView.swift */,
+				FD6686822968E70000FD8C4A /* OperatorMatrixView.swift */,
+				FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */,
+				FD6686862968E70000FD8C4A /* OperatorPanel.swift */,
+				FD6686882968E70000FD8C4A /* GlobalPanel.swift */,
 				FD1F702229A7DD8800B2D690 /* Keyboard.swift */,
 			);
 			path = Synthesizer;
@@ -289,6 +310,13 @@
 				FD6686752968E70000FD8C4A /* Algorithms.swift in Sources */,
 				FD6686772968E70000FD8C4A /* SynthEngine.swift in Sources */,
 				FD66867B2968E70000FD8C4A /* LFO.swift in Sources */,
+				FD66867D2968E70000FD8C4A /* Knob.swift in Sources */,
+				FD66867F2968E70000FD8C4A /* LabeledSlider.swift in Sources */,
+				FD6686812968E70000FD8C4A /* KeyboardView.swift in Sources */,
+				FD6686832968E70000FD8C4A /* OperatorMatrixView.swift in Sources */,
+				FD6686852968E70000FD8C4A /* AlgorithmSelector.swift in Sources */,
+				FD6686872968E70000FD8C4A /* OperatorPanel.swift in Sources */,
+				FD6686892968E70000FD8C4A /* GlobalPanel.swift in Sources */,
 			);
 		};
 		FD6686432968D8A700FD8C4A /* Sources */ = {
