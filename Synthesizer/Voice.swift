@@ -1,0 +1,183 @@
+//
+// Voice.swift
+// Synthesizer
+//
+// A polyphonic FM voice: 6 operators connected via an algorithm.
+// Renders one block of audio samples per call.
+//
+
+import AVFoundation
+import Foundation
+
+/// Voice lifecycle state.
+enum VoiceState: Int {
+ case free // Not allocated, available for noteOn
+ case active // Playing a note (attack/decay/sustain)
+ case releasing // Note off, in release phase
+}
+
+/// A 6-operator FM voice.
+///
+/// Operators are rendered in index order (0..<6). Each operator's output is
+/// fed to the modulation inputs of its targets according to the algorithm.
+/// Carrier outputs are summed to produce the voice output.
+final class Voice {
+ 
+ // MARK: - Voice management
+ 
+ /// The sample rate.
+ let sampleRate: Double
+ 
+ /// Current voice state.
+ private(set) var state: VoiceState = .free
+ 
+ /// MIDI note currently playing (or -1 if none).
+ private(set) var midiNote: UInt8 = 0
+ 
+ /// The 6 operators.
+ let operators: [Operator]
+ 
+ /// The algorithm used by this voice.
+ private(set) var algorithm: FMAlgorithm
+ 
+ /// Feedback sample buffer: previous output of the feedback operator.
+ /// Used for one-sample-delayed self-modulation.
+ private var feedbackSample: Float = 0
+ 
+ /// Whether the voice has finished releasing and is silent.
+ var isSilent: Bool {
+ state == .free || (state == .releasing && operators.allSatisfy { $0.envelopeState == .off })
+ }
+ 
+ init(sampleRate: Double, algorithm: FMAlgorithm) {
+ self.sampleRate = sampleRate
+ self.algorithm = algorithm
+ self.operators = (0..<6).map { Operator(index: $0, sampleRate: sampleRate) }
+ }
+ 
+ // MARK: - Configuration
+ 
+ /// Sets the algorithm used by this voice.
+ func setAlgorithm(_ newAlgorithm: FMAlgorithm) {
+ self.algorithm = newAlgorithm
+ feedbackSample = 0
+ }
+ 
+ /// Configures all operators from a parameter set.
+ /// `params` is an array of 6 tuples: (ratio, detune, level, attack, decay, sustain, release).
+ func configureOperators(_ params: [(ratio: Float, detune: Float, level: Float, attack: Float, decay: Float, sustain: Float, release: Float)]) {
+ for (op, p) in zip(operators, params) {
+ op.ratio = p.ratio
+ op.detune = p.detune
+ op.level = p.level
+ op.attack = p.attack
+ op.decay = p.decay
+ op.sustain = p.sustain
+ op.release = p.release
+ }
+ }
+ 
+ // MARK: - Note control
+ 
+ /// Starts a note.
+ /// - Parameters:
+ /// - midiNote: MIDI note number (0–127).
+ /// - velocity: Note velocity (0–127).
+ /// - baseFrequency: The fundamental frequency in Hz (before ratio/detune).
+ func noteOn(midiNote: UInt8, velocity: Float, baseFrequency: Float) {
+ self.midiNote = midiNote
+ self.state = .active
+ 
+ for op in operators {
+ op.noteOn(velocity: velocity, noteFrequency: baseFrequency)
+ }
+ }
+ 
+ /// Starts the release phase for the current note.
+ func noteOff() {
+ guard state == .active || state == .releasing else { return }
+ state = .releasing
+ for op in operators {
+ op.noteOff()
+ }
+ }
+ 
+ /// Immediately silences the voice (for voice stealing).
+ func silence() {
+ state = .free
+ midiNote = 0
+ feedbackSample = 0
+ for op in operators {
+ op.silence()
+ }
+ }
+ 
+ // MARK: - Render
+ 
+ /// Renders a block of stereo-interleaved samples.
+ ///
+ /// - Parameter frameCount: Number of frames to render.
+ /// - Returns: Array of `frameCount` mono samples (applied to all channels).
+ func render(frameCount: Int) -> [Float] {
+ var samples = [Float](repeating: 0, count: frameCount)
+ 
+ guard state != .free else { return samples }
+ 
+ let lfoValue: Float = 0 // LFO is applied at the engine level in Step 2
+ 
+ for frame in 0..<frameCount {
+ let frameSample = renderFrame(lfoValue: lfoValue)
+ samples[frame] = frameSample
+ 
+ // Check if voice has finished releasing
+ if state == .releasing && isSilent {
+ state = .free
+ // Fill remaining frames with silence
+ for remaining in (frame + 1)..<frameCount {
+ samples[remaining] = 0
+ }
+ break
+ }
+ }
+ 
+ return samples
+ }
+ 
+ /// Renders a single frame (one sample per operator, summed per algorithm).
+ @inline(__always)
+ private func renderFrame(lfoValue: Float) -> Float {
+ // Modulation inputs for each operator, accumulated from modulators.
+ var modInputs = [Float](repeating: 0, count: 6)
+ 
+ // Apply feedback from the previous frame (one-sample delay).
+ if let fbOp = algorithm.feedbackOperator {
+ modInputs[fbOp] += feedbackSample * algorithm.feedbackLevel
+ }
+ 
+ var carrierSum: Float = 0
+ var currentSamples = [Float](repeating: 0, count: 6)
+ 
+ for opIndex in 0..<6 {
+ let op = operators[opIndex]
+ let sample = op.render(modulationInput: modInputs[opIndex], lfoValue: lfoValue)
+ currentSamples[opIndex] = sample
+ 
+ // Feed this operator's output to its modulation targets.
+ for connection in algorithm.modulationsFrom(source: opIndex) {
+ modInputs[connection.target] += sample * connection.index
+ }
+ 
+ // Sum carrier outputs.
+ if algorithm.carriers.contains(opIndex) {
+ carrierSum += sample
+ }
+ }
+ 
+ // Save feedback sample for next frame.
+ if let fbOp = algorithm.feedbackOperator {
+ feedbackSample = currentSamples[fbOp]
+ }
+ 
+ return carrierSum
+ }
+}

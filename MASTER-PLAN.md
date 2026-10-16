@@ -14,7 +14,7 @@
 | Step | File | Status | Suggested LLM |
 |------|------|--------|---------------|
 | 0 | `STEP-00-project-audit.md` | done | Any lightweight (Nemotron / GPT-4o-mini) |
-| 1 | `STEP-01-fm-engine-core.md` | todo | Strong coding (Claude Sonnet 4 / GPT-5 / Gemini 2.5 Pro) |
+| 1 | `STEP-01-fm-engine-core.md` | done | Strong coding (Claude Sonnet 4 / GPT-5 / Gemini 2.5 Pro) |
 | 2 | `STEP-02-modulation.md` | todo | Claude Sonnet 4 / Nemotron |
 | 3 | `STEP-03-effects-chain.md` | deferred | Claude Sonnet 4 / Nemotron |
 | 4 | `STEP-04-ui-v1.md` | todo | Claude Sonnet 4 / Nemotron (SwiftUI) |
@@ -25,7 +25,7 @@
 
 ## Progress
 - [x] Step 0: Project audit & foundation
-- [ ] Step 1: FM engine core (6 operators, 32 algorithms, 12 voices)
+- [x] Step 1: FM engine core (6 operators, 32 algorithms, 12 voices)
 - [ ] Step 2: Modulation (LFO, velocity, transpose, sync, pitch bend)
 - [ ] Step 3: Effects chain (deferred)
 - [ ] Step 4: UI v1 (keyboard, operator matrix, knobs)

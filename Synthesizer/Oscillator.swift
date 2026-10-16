@@ -2,93 +2,76 @@
 // Oscillator.swift
 // Synthesizer
 //
-// Created by Carlos Azuaje on 06/01/2023.
+// Phase-accumulating sine oscillator for FM synthesis.
+// Replaces the time-based oscillator from the original project.
 //
 
 import Foundation
 
-typealias Signal = (Float, Float) -> (Float)
+/// Converts a MIDI note number (0–127) to frequency in Hz.
+/// Standard formula: f = 440 * 2^((n - 69) / 12)
+/// Equivalent to: (440 / 32) * 2^((n - 9) / 12)
+public func midiNoteToFreq(midiNumber: UInt8) -> Float {
+ return (440.0 / 32.0) * pow(2.0, (Float(midiNumber) - 9.0) / 12.0)
+}
 
-class Oscillator {
- // The amplitude of the oscillator's output signal
- static var amplitude: Float = 1
+/// Phase-accumulating sine oscillator.
+///
+/// Unlike the old time-based oscillator (sin(2*pi*f*t)), this oscillator
+/// accumulates phase sample-by-sample, which is essential for phase-continuous
+/// FM synthesis where one oscillator's output modulates another's frequency.
+final class PhaseOscillator {
  
- // The sample rate of the audio system
+ /// The sample rate of the audio system (Hz).
  let sampleRate: Double
  
- // The attack time of the ADSR envelope (in seconds)
- static var attackTime: Float = 0.02
+ /// Current phase in radians (0 ..< 2*pi).
+ private(set) var phase: Float = 0
  
- // The decay time of the ADSR envelope (in seconds)
- static var decayTime: Float = 0.2
+ /// Frequency in Hz.
+ var frequency: Float = 440.0 {
+ didSet {
+ updatePhaseIncrement()
+ }
+ }
  
- // The sustain level of the ADSR envelope (between 0 and 1)
- static var sustainLevel: Float = 0.4
- 
- // The release time of the ADSR envelope (in seconds)
- static var releaseTime: Float = 0.6
+ /// Phase increment per sample (radians).
+ private var phaseIncrement: Float = 0
  
  init(sampleRate: Double) {
  self.sampleRate = sampleRate
+ self.frequency = 440.0
+ updatePhaseIncrement()
  }
  
- // Generate an ADSR envelope for a given time
- func adsrEnvelope(time: Float) -> Float {
- let attackSamples = Int(Double(Oscillator.attackTime) * sampleRate)
- let decaySamples = Int(Double(Oscillator.decayTime) * sampleRate)
- let releaseSamples = Int(Double(Oscillator.releaseTime) * sampleRate)
- 
- // Calculate the envelope value for the current time
- if time < Oscillator.attackTime {
- // Attack phase
- let attackDelta = Oscillator.amplitude / Float(attackSamples)
- return attackDelta * Float(Double(time) * sampleRate)
- } else if time < (Oscillator.attackTime + Oscillator.decayTime) {
- // Decay phase
- let decayDelta = (Oscillator.amplitude - Oscillator.sustainLevel) / Float(decaySamples)
- let decayTime = time - Oscillator.attackTime
- return Oscillator.amplitude - decayDelta * Float(Double(decayTime) * sampleRate)
- } else if time < (Oscillator.attackTime + Oscillator.decayTime + Oscillator.sustainLevel) {
- return Oscillator.sustainLevel
- } else {
- // Release phase
- let releaseDelta = Oscillator.sustainLevel / Float(releaseSamples)
- let releaseTime = time - (Oscillator.attackTime + Oscillator.decayTime + Oscillator.sustainLevel)
- let releaseLevel = Oscillator.sustainLevel - releaseDelta * Float(Double(releaseTime) * sampleRate)
- if releaseLevel <= 0 {
-// https://github.com/anujagannath24/ADSRenvelope/blob/master/ADSR.c
-// Still need figure out the reset attack for next time with press same key
- return 0
- } else {
- return releaseLevel
- }
- }
+ private func updatePhaseIncrement() {
+ phaseIncrement = 2.0 * Float.pi * frequency / Float(sampleRate)
  }
  
- // The sine wave signal generator function that takes a time and frequency and returns the sample value of a sine wave at that time and frequency
- func sine(time: Float, frequency: Float) -> Float {
- // Generate the sine wave sample value at the given time and frequency
- let sineValue = sin(2.0 * Float.pi * frequency * time)
- 
- // Apply the ADSR envelope to the sine wave sample value
- let envelopeValue = adsrEnvelope(time: time)
- return Oscillator.amplitude * envelopeValue * sineValue
+ /// Generates the next sample and advances the phase.
+ /// Returns a sine value in the range -1...1.
+ @inline(__always)
+ func nextSample() -> Float {
+ let sample = sin(phase)
+ phase += phaseIncrement
+ if phase >= 2.0 * Float.pi {
+ phase -= 2.0 * Float.pi
+ } else if phase < 0 {
+ phase += 2.0 * Float.pi
+ }
+ return sample
  }
  
- func piano(time: Float, frequency: Float) -> Float {
- let harmonic1 = Oscillator.amplitude * sin(2.0 * Float.pi * frequency * time)
- let harmonic2 = (Oscillator.amplitude / 2) * sin(2.0 * Float.pi * 2 * frequency * time)
- let harmonic3 = (Oscillator.amplitude / 3) * sin(2.0 * Float.pi * 3 * frequency * time)
- let harmonic4 = (Oscillator.amplitude / 4) * sin(2.0 * Float.pi * 4 * frequency * time)
- let harmonic5 = (Oscillator.amplitude / 5) * sin(2.0 * Float.pi * 5 * frequency * time)
- let harmonic6 = (Oscillator.amplitude / 6) * sin(2.0 * Float.pi * 6 * frequency * time)
- 
- // Apply ADSR envelope
- let envelope = adsrEnvelope(time: time)
- return envelope * tanh(harmonic1 + harmonic2 + harmonic3 + harmonic4 + harmonic5 + harmonic6)
+ /// Resets phase to zero (useful for oscillator sync).
+ func resetPhase() {
+ phase = 0
  }
+}
 
- static func midiNoteToFreq(midiNumber: UInt8) -> Float {
- return (440 / 32) * pow(2, ( (Float(midiNumber) - 9) / 12 ))
- }
+/// Applies a frequency modulation offset to an oscillator's base frequency.
+/// The modulation input is added to the base frequency to produce the
+/// effective frequency for the current sample.
+@inline(__always)
+public func modulatedFrequency(base: Float, modulationInput: Float, modulationIndex: Float) -> Float {
+ return base + modulationInput * modulationIndex
 }

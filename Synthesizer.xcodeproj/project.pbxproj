@@ -18,6 +18,11 @@
 		FD6686662968D9CD00FD8C4A /* Gong in Frameworks */ = {isa = PBXBuildFile; productRef = FD6686652968D9CD00FD8C4A /* Gong */; };
 		FD66866A2968DD3C00FD8C4A /* Synth.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686692968DD3C00FD8C4A /* Synth.swift */; };
 		FD66866C2968E6EF00FD8C4A /* Oscillator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66866B2968E6EF00FD8C4A /* Oscillator.swift */; };
+		FD6686712968E70000FD8C4A /* Operator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686702968E70000FD8C4A /* Operator.swift */; };
+		FD6686732968E70000FD8C4A /* Voice.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686722968E70000FD8C4A /* Voice.swift */; };
+		FD6686752968E70000FD8C4A /* Algorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686742968E70000FD8C4A /* Algorithms.swift */; };
+		FD6686772968E70000FD8C4A /* SynthEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686762968E70000FD8C4A /* SynthEngine.swift */; };
+		FD6686792968E70000FD8C4A /* FMEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686782968E70000FD8C4A /* FMEngineTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,6 +57,11 @@
 		FD6686572968D8A700FD8C4A /* SynthesizerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthesizerUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		FD6686692968DD3C00FD8C4A /* Synth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Synth.swift; sourceTree = "<group>"; };
 		FD66866B2968E6EF00FD8C4A /* Oscillator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oscillator.swift; sourceTree = "<group>"; };
+		FD6686702968E70000FD8C4A /* Operator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Operator.swift; sourceTree = "<group>"; };
+		FD6686722968E70000FD8C4A /* Voice.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Voice.swift; sourceTree = "<group>"; };
+		FD6686742968E70000FD8C4A /* Algorithms.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Algorithms.swift; sourceTree = "<group>"; };
+		FD6686762968E70000FD8C4A /* SynthEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthEngine.swift; sourceTree = "<group>"; };
+		FD6686782968E70000FD8C4A /* FMEngineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FMEngineTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +120,10 @@
 				FD66863F2968D8A700FD8C4A /* Preview Content */,
 				FD6686692968DD3C00FD8C4A /* Synth.swift */,
 				FD66866B2968E6EF00FD8C4A /* Oscillator.swift */,
+				FD6686702968E70000FD8C4A /* Operator.swift */,
+				FD6686722968E70000FD8C4A /* Voice.swift */,
+				FD6686742968E70000FD8C4A /* Algorithms.swift */,
+				FD6686762968E70000FD8C4A /* SynthEngine.swift */,
 				FD1F702229A7DD8800B2D690 /* Keyboard.swift */,
 			);
 			path = Synthesizer;
@@ -127,6 +141,7 @@
 			isa = PBXGroup;
 			children = (
 				FD66864B2968D8A700FD8C4A /* SynthesizerTests.swift */,
+				FD6686782968E70000FD8C4A /* FMEngineTests.swift */,
 			);
 			path = SynthesizerTests;
 			sourceTree = "<group>";
@@ -281,6 +296,10 @@
 				FD1F702329A7DD8800B2D690 /* Keyboard.swift in Sources */,
 				FD66863A2968D8A700FD8C4A /* SynthesizerApp.swift in Sources */,
 				FD66866C2968E6EF00FD8C4A /* Oscillator.swift in Sources */,
+				FD6686712968E70000FD8C4A /* Operator.swift in Sources */,
+				FD6686732968E70000FD8C4A /* Voice.swift in Sources */,
+				FD6686752968E70000FD8C4A /* Algorithms.swift in Sources */,
+				FD6686772968E70000FD8C4A /* SynthEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -289,6 +308,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FD66864C2968D8A700FD8C4A /* SynthesizerTests.swift in Sources */,
+				FD6686792968E70000FD8C4A /* FMEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
