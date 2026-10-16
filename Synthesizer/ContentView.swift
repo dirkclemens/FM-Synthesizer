@@ -3,7 +3,8 @@
 // Synthesizer
 //
 // Main window: FM synthesizer engine UI with preset browser, keyboard,
-// operator matrix, per-operator controls, and global parameters.
+// operator matrix, per-operator controls, global parameters, arpeggiator,
+// and sequencer.
 //
 
 import SwiftUI
@@ -17,6 +18,14 @@ struct ContentView: View {
  VStack(spacing: 0) {
  // MARK: Preset browser
  PresetBrowserView(bank: bank, engine: engine)
+
+ Divider()
+
+ // MARK: Arpeggiator + Sequencer
+ HStack(spacing: 12) {
+ ArpeggiatorView(arpeggiator: engine.arpeggiator)
+ SequencerView(sequencer: engine.sequencer)
+ }
 
  Divider()
 
@@ -51,17 +60,25 @@ struct ContentView: View {
  KeyboardView(
  onKeyDown: { note in
  activeNotes.insert(note)
+ if engine.arpeggiator.isRunning {
+ engine.arpeggiator.holdNote(note)
+ } else {
  engine.noteOn(midiNote: note, velocity: 100)
+ }
  },
  onKeyUp: { note in
  activeNotes.remove(note)
+ if engine.arpeggiator.isRunning {
+ arpeggiatorKeyUp(note: note)
+ } else {
  engine.noteOff(midiNote: note)
+ }
  },
  activeNotes: activeNotes
  )
  .padding(.bottom, 8)
  }
- .frame(minWidth: 900, minHeight: 750)
+ .frame(minWidth: 900, minHeight: 850)
  .padding(8)
  .onAppear {
  do {
@@ -72,6 +89,17 @@ struct ContentView: View {
  }
  .onDisappear {
  engine.stop()
+ engine.arpeggiator.stop()
+ engine.sequencer.stop()
+ }
+ }
+
+ /// Handle key up when arpeggiator is running: release from arpeggiator.
+ private func arpeggiatorKeyUp(note: UInt8) {
+ engine.arpeggiator.releaseNote(note)
+ // If arpeggiator has no held notes, stop it.
+ if engine.arpeggiator.heldNotes.isEmpty {
+ engine.arpeggiator.stop()
  }
  }
 }

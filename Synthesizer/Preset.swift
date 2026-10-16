@@ -35,6 +35,12 @@ struct Preset: Codable, Equatable {
  var lfoWave: Int = 0 // LFOWave.rawValue
  var operators: [OperatorPreset] = Array(repeating: OperatorPreset(), count: 6)
  var effects: [Int: EffectConfig] = [:] // EffectType.rawValue → EffectConfig
+ var arpeggiatorMode: Int = 0 // ArpMode.rawValue
+ var arpeggiatorRate: Float = 4.0
+ var arpeggiatorGate: Float = 0.7
+ var arpeggiatorOctaveRange: Int = 1
+ var sequencerTempo: Float = 120.0
+ var sequencerSteps: [SequencerStep] = Array(repeating: SequencerStep(), count: 16)
 
  init(name: String) {
  self.name = name

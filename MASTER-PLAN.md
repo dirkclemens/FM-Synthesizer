@@ -20,7 +20,7 @@
 | 4 | `STEP-04-ui-v1.md` | done | Claude Sonnet 4 / Nemotron (SwiftUI) |
 | 5 | `STEP-05-preset-system.md` | done | Any lightweight (Nemotron / GPT-4o-mini) |
 | Keyboard | Keyboard polish (real piano layout) | done | Nemotron |
-| 6 | `STEP-06-arpeggiator-sequencer.md` | deferred | Claude Sonnet 4 |
+| 6 | `STEP-06-arpeggiator-sequencer.md` | done | Claude Sonnet 4 |
 | 7 | `STEP-07-midi-integration.md` | deferred | Claude Sonnet 4 / Nemotron |
 | 8 | `STEP-08-polish-release.md` | deferred | Any lightweight |
 
@@ -32,7 +32,7 @@
 - [x] Step 4: UI v1 (keyboard, operator matrix, knobs)
 - [x] Keyboard polish (real piano black key placement)
 - [x] Step 5: Preset system (128 slots, JSON, Application Support)
-- [ ] Step 6: Arpeggiator & sequencer (deferred)
+- [x] Step 6: Arpeggiator & sequencer (up/down/up-down/random/ordered/chord/note-repeat, 16-step sequencer)
 - [ ] Step 7: CoreMIDI integration (deferred)
 - [ ] Step 8: Polish & release (deferred)
 

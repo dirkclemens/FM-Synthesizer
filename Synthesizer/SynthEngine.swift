@@ -144,6 +144,12 @@ final class SynthEngine: ObservableObject {
  didSet { effects.setFilterResonance(effectFilterResonance) }
  }
 
+ /// Arpeggiator.
+ lazy var arpeggiator: Arpeggiator = Arpeggiator(engine: self)
+
+ /// Sequencer.
+ lazy var sequencer: Sequencer = Sequencer(engine: self)
+
  /// Parameter lock for thread-safe reads on the audio thread.
  private let paramLock = ParameterLock()
 
@@ -382,6 +388,14 @@ final class SynthEngine: ObservableObject {
  p.effects[type.rawValue] = config
  }
  }
+ // Arpeggiator state.
+ p.arpeggiatorMode = arpeggiator.mode.rawValue
+ p.arpeggiatorRate = arpeggiator.rate
+ p.arpeggiatorGate = arpeggiator.gate
+ p.arpeggiatorOctaveRange = arpeggiator.octaveRange
+ // Sequencer state.
+ p.sequencerTempo = sequencer.tempo
+ p.sequencerSteps = sequencer.steps
  return p
  }
 
@@ -441,5 +455,17 @@ final class SynthEngine: ObservableObject {
  // Rebuild chain with new effect states.
  effects.rebuildChain()
  }
+ 
+ // Arpeggiator state.
+ if let mode = ArpMode(rawValue: preset.arpeggiatorMode) {
+ arpeggiator.mode = mode
+ }
+ arpeggiator.rate = preset.arpeggiatorRate
+ arpeggiator.gate = preset.arpeggiatorGate
+ arpeggiator.octaveRange = preset.arpeggiatorOctaveRange
+ 
+ // Sequencer state.
+ sequencer.tempo = preset.sequencerTempo
+ sequencer.steps = preset.sequencerSteps
  }
 }
