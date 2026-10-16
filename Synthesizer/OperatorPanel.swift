@@ -87,7 +87,7 @@ struct OperatorPanel: View {
 
  // ADSR
  HStack(spacing: 12) {
- LabeledSlider(
+ Knob(
  title: "A",
  value: Binding(
  get: { params.3 },
@@ -95,12 +95,11 @@ struct OperatorPanel: View {
  ),
  range: 0...2,
  step: 0.01,
- unit: " s",
  formatter: { String(format: "%.2f", $0) }
  )
  .frame(maxWidth: .infinity)
 
- LabeledSlider(
+ Knob(
  title: "D",
  value: Binding(
  get: { params.4 },
@@ -108,12 +107,11 @@ struct OperatorPanel: View {
  ),
  range: 0...2,
  step: 0.01,
- unit: " s",
  formatter: { String(format: "%.2f", $0) }
  )
  .frame(maxWidth: .infinity)
 
- LabeledSlider(
+ Knob(
  title: "S",
  value: Binding(
  get: { params.5 },
@@ -121,12 +119,11 @@ struct OperatorPanel: View {
  ),
  range: 0...1,
  step: 0.01,
- unit: "",
  formatter: { String(format: "%.2f", $0) }
  )
  .frame(maxWidth: .infinity)
 
- LabeledSlider(
+ Knob(
  title: "R",
  value: Binding(
  get: { params.6 },
@@ -134,7 +131,6 @@ struct OperatorPanel: View {
  ),
  range: 0...5,
  step: 0.01,
- unit: " s",
  formatter: { String(format: "%.2f", $0) }
  )
  .frame(maxWidth: .infinity)
