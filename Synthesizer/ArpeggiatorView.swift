@@ -75,7 +75,7 @@ struct ArpeggiatorView: View {
  
  // Rate and gate
  HStack(spacing: 16) {
- LabeledSlider(
+ Knob(
  title: "Rate",
  value: Binding(
  get: { arpeggiator.rate },
@@ -83,12 +83,11 @@ struct ArpeggiatorView: View {
  ),
  range: 0.5...20,
  step: 0.1,
- unit: " n/s",
  formatter: { String(format: "%.1f", $0) }
  )
  .frame(maxWidth: .infinity)
  
- LabeledSlider(
+ Knob(
  title: "Gate",
  value: Binding(
  get: { arpeggiator.gate },
@@ -96,14 +95,13 @@ struct ArpeggiatorView: View {
  ),
  range: 0.1...1.0,
  step: 0.05,
- unit: "",
  formatter: { String(format: "%.2f", $0) }
  )
  .frame(maxWidth: .infinity)
  }
  
  // Octave range
- LabeledSlider(
+ Knob(
  title: "Octaves",
  value: Binding(
  get: { Float(arpeggiator.octaveRange) },
@@ -111,7 +109,6 @@ struct ArpeggiatorView: View {
  ),
  range: 1...4,
  step: 1,
- unit: "",
  formatter: { String(format: "%.0f", $0) }
  )
  }
