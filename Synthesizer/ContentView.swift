@@ -12,10 +12,8 @@ import SwiftUI
 struct ContentView: View {
  @StateObject private var engine = SynthEngine()
  @StateObject private var bank = PresetBank()
- @StateObject private var midiManager: MIDIManager = {
- let m = MIDIManager()
- return m
- }()
+ @StateObject private var midiManager = MIDIManager()
+ @StateObject private var macKeyboardHandler = MacKeyboardHandler()
  @State private var activeNotes: Set<UInt8> = []
 
  var body: some View {
@@ -137,6 +135,8 @@ struct ContentView: View {
  .onAppear {
  midiManager.engine = engine
  engine.presetBank = bank
+ macKeyboardHandler.engine = engine
+ macKeyboardHandler.start()
  midiManager.refreshSources()
  do {
  try engine.start()
@@ -148,6 +148,7 @@ struct ContentView: View {
  engine.stop()
  engine.arpeggiator.stop()
  engine.sequencer.stop()
+ macKeyboardHandler.stop()
  }
  }
 
