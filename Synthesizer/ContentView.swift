@@ -109,6 +109,8 @@ struct ContentView: View {
  Divider()
 
  // MARK: Keyboard
+ HStack(spacing: 0) {
+ Spacer()
  KeyboardView(
  onKeyDown: { note in
  activeNotes.insert(note)
@@ -128,6 +130,8 @@ struct ContentView: View {
  },
  activeNotes: activeNotes
  )
+ Spacer()
+ }
  .padding(.bottom, 8)
  }
  .frame(minWidth: 900, minHeight: 850)
