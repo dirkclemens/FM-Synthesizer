@@ -63,7 +63,10 @@ func blackKeyXOffset(midiCode: Int) -> CGFloat {
  guard let leftWhiteNote = blackKeyLeftWhiteNote[noteInOctave] else { return 0 }
  let leftWhiteMidi = (midiCode / 12) * 12 + leftWhiteNote
  let leftWhiteX = whiteKeyXOffset(midiCode: leftWhiteMidi)
- return leftWhiteX + keyboardWhiteKeyWidth - keyboardBlackKeyWidth / 2
+ // Center the black key on the boundary between two white keys.
+ // The boundary center is halfway across the left white key.
+ let boundaryCenter = leftWhiteX + keyboardWhiteKeyWidth / 2
+ return boundaryCenter - keyboardBlackKeyWidth / 2
 }
 
 struct KeyboardView: View {
@@ -71,37 +74,43 @@ struct KeyboardView: View {
  var onKeyUp: ((UInt8) -> Void)?
  var activeNotes: Set<UInt8> = []
 
+ /// Only the white keys, in order.
+ private var whiteKeys: [UInt8] {
+ return Array(keyboardNoteRange).filter { isWhiteKey(midiCode: Int($0)) }
+ }
+
+ /// Only the black keys, in order.
+ private var blackKeys: [UInt8] {
+ return Array(keyboardNoteRange).filter { !isWhiteKey(midiCode: Int($0)) }
+ }
+
  var body: some View {
  ZStack(alignment: .topLeading) {
  // Bottom layer: white keys evenly spaced
- HStack(spacing: 1) {
- ForEach(Array(keyboardNoteRange), id: \.self) { code in
- if isWhiteKey(midiCode: Int(code)) {
+ HStack(spacing: 0) {
+ ForEach(whiteKeys, id: \.self) { code in
  WhiteKeyView(
  midiCode: code,
  isActive: activeNotes.contains(code),
  onDown: { onKeyDown?(code) },
  onUp: { onKeyUp?(code) }
  )
- } else {
- Color.clear.frame(width: keyboardWhiteKeyWidth)
- }
  }
  }
  .frame(height: keyboardWhiteKeyHeight)
 
  // Top layer: black keys overlaid at correct positions
- ForEach(Array(keyboardNoteRange), id: \.self) { code in
- if !isWhiteKey(midiCode: Int(code)) {
+ ForEach(blackKeys, id: \.self) { code in
  BlackKeyView(
  midiCode: code,
  isActive: activeNotes.contains(code),
  onDown: { onKeyDown?(code) },
  onUp: { onKeyUp?(code) }
  )
- .position(x: blackKeyXOffset(midiCode: Int(code)) + keyboardBlackKeyWidth / 2,
- y: keyboardBlackKeyHeight / 2)
- }
+ .position(
+ x: blackKeyXOffset(midiCode: Int(code)) + keyboardBlackKeyWidth / 2,
+ y: keyboardBlackKeyHeight / 2
+ )
  }
  }
  .frame(height: keyboardWhiteKeyHeight)
