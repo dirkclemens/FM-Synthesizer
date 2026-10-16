@@ -112,8 +112,8 @@ struct KeyboardView: View {
  y: keyboardBlackKeyHeight / 2
  )
  }
- }
  .frame(height: keyboardWhiteKeyHeight)
+ }
  }
 }
 

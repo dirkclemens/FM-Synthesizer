@@ -161,10 +161,11 @@ final class EffectsChain {
  
  /// Rebuilds the effect chain based on current enabled/disabled states.
  func rebuildChain() {
- // Disconnect all existing connections from input and output.
- audioEngine.disconnectNodeInput(inputNode)
- audioEngine.disconnectNodeOutput(outputNode)
- 
+ // Disconnect the output of inputNode (mainMixer) and input of outputNode.
+ // The effects chain inserts between mainMixer and outputNode.
+ audioEngine.disconnectNodeOutput(inputNode)
+ audioEngine.disconnectNodeInput(outputNode)
+
  // Disconnect all created effect nodes.
  for type in createdNodes {
  if let node = nodeFor(type) {
@@ -172,20 +173,20 @@ final class EffectsChain {
  audioEngine.disconnectNodeOutput(node)
  }
  }
- 
+
  // Build the chain: input → [enabled effects] → output
  var previousNode: AVAudioNode = inputNode
- 
+
  for type in EffectType.allCases {
  guard let config = configs[type], config.enabled else { continue }
- 
+
  let effectNode = createNode(for: type)
  if let effectNode = effectNode {
  audioEngine.connect(previousNode, to: effectNode, format: nil)
  previousNode = effectNode
  }
  }
- 
+
  // Connect last effect to output.
  audioEngine.connect(previousNode, to: outputNode, format: nil)
  lastNode = previousNode
