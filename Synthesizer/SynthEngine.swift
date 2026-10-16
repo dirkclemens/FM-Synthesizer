@@ -150,6 +150,9 @@ final class SynthEngine: ObservableObject {
  /// Sequencer.
  lazy var sequencer: Sequencer = Sequencer(engine: self)
 
+ /// Reference to the preset bank (set from ContentView for MIDI program change).
+ weak var presetBank: PresetBank?
+
  /// Parameter lock for thread-safe reads on the audio thread.
  private let paramLock = ParameterLock()
 
