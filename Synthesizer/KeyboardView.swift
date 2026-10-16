@@ -84,6 +84,8 @@ struct KeyboardView: View {
  }
 
  var body: some View {
+ let keyboardWidth = CGFloat(whiteKeys.count) * keyboardWhiteKeyWidth
+ 
  ZStack(alignment: .topLeading) {
  // Bottom layer: white keys evenly spaced
  HStack(spacing: 0) {
@@ -112,7 +114,7 @@ struct KeyboardView: View {
  )
  }
  }
- .frame(height: keyboardWhiteKeyHeight)
+ .frame(width: keyboardWidth, height: keyboardWhiteKeyHeight)
  }
 }
 
