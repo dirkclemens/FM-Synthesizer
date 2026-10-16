@@ -1,7 +1,7 @@
 # FM Synthesizer — User Manual
 
 > **Management Summary** 
-> This is a macOS software clone of the 6-Operator FM pocket FM synthesizer. It is a **6-operator FM synthesis engine** with **32 algorithms**, **12-voice polyphony**, **128 preset slots**, built-in **effects** (filter, distortion, chorus, delay, reverb, phaser), an **arpeggiator** (7 modes), a **16-step sequencer**, and **CoreMIDI** support. Play it with the on-screen piano keyboard, your Mac's computer keyboard (QWERTY layout mapped like a piano), or an external MIDI keyboard. Designed for personal use, standalone, native macOS SwiftUI.
+> This is a macOS 6-operator FM synthesizer. It is a **6-operator FM synthesis engine** with **32 algorithms**, **12-voice polyphony**, **128 preset slots**, built-in **effects** (filter, distortion, chorus, delay, reverb, phaser), an **arpeggiator** (7 modes), a **16-step sequencer**, and **CoreMIDI** support. Play it with the on-screen piano keyboard, your Mac's computer keyboard (QWERTY layout mapped like a piano), or an external MIDI keyboard. Designed for personal use, standalone, native macOS SwiftUI.
 
 ---
 
@@ -388,6 +388,7 @@ These are **note generators** — they create note on/off events that drive the 
 
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.1 | 2026-10-16 | Removed all brand references (, ) from manual and plan files; renamed to generic "6-Operator FM Synthesizer" |
 | 1.0 | 2026-10-16 | Initial manual covering Steps 0–7 (FM engine, modulation, effects, UI, presets, arpeggiator, sequencer, CoreMIDI, Mac keyboard) |
 
 ---

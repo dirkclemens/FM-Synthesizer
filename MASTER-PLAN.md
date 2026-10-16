@@ -1,4 +1,4 @@
-# Master Plan — 6-Operator FM Software Clone (macOS)
+# Master Plan — 6-Operator FM Synthesizer (macOS)
 
 ## Project decisions (from user)
 - Platform: macOS only, standalone app (no AU/VST)

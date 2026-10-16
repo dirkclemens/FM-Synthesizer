@@ -1,4 +1,4 @@
-# Detailed Plan — 6-Operator FM Software Clone (macOS, Swift + SwiftUI)
+# Detailed Plan — 6-Operator FM Synthesizer (macOS, Swift + SwiftUI)
 
 > ⚠️ This file has been superseded by `MASTER-PLAN.md` + individual `STEP-*.md` files.
 > Use `MASTER-PLAN.md` to track progress and execute one step file at a time.
@@ -6,7 +6,7 @@
 
 ## 1. Goal
 
-Turn the existing very-basic Swift/SwiftUI synthesizer into a software clone of the **6-Operator FM Synthesizer** running as a native macOS application.
+Turn the existing very-basic Swift/SwiftUI synthesizer into a software 6-operator FM Synthesizer running as a native macOS application.
 
 Core target features (from the 6-operator FM synth spec):
 - 6-operator FM synthesis engine with 32 algorithms
@@ -161,7 +161,7 @@ Before coding, I need your input on:
 ## 7. Questions for you (please answer before I code)
 
 1. **Target platform/toolchain:** Which macOS minimum deployment target, Swift version, and Xcode version should I target? Should I modernize the project (e.g., replace the old `Synth<SynthProtocol>` generic misuse, update package configurations)?
-2. **UI style:** Should the clone reproduce the hardware look (TFT display, seven rotary knobs, 27 silicone keys) as closely as possible, or would you prefer a clean, modern macOS-native synthesizer UI?
+2. **UI style:** Should the synth reproduce a hardware look (display, rotary knobs, keys) as closely as possible, or would you prefer a clean, modern macOS-native synthesizer UI?
 3. **MVP scope:** Should Phase 1–4 (engine + UI + presets) be the first deliverable, with FX/arpeggiator/sequencer as follow-ups? Or include everything in v1?
 4. **Plug-in format:** Standalone macOS app only, or do you eventually want an AUv3/VST version too?
 5. **MIDI library:** Keep using Gong, or switch to Apple's CoreMIDI framework directly?

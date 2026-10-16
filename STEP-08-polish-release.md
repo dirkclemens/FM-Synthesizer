@@ -52,4 +52,4 @@ Performance tuning, bug fixes, app icon, About window, code signing/notarization
 - [ ] Step 8 marked complete in `MASTER-PLAN.md`
 
 ## Done
-v1 of the 6-Operator FM Synthesizer is complete.
+v1 of the 6-operator FM synthesizer is complete.
