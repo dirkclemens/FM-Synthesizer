@@ -76,6 +76,11 @@ final class Arpeggiator: ObservableObject {
  noteOrder.append(note)
  }
  resetPosition()
+ // Play the note immediately when arpeggiator is running
+ if isRunning {
+ engine?.noteOn(midiNote: note, velocity: 100)
+ notesSounding.insert(note)
+ }
  }
  
  /// Releases a held note (called on key up).
@@ -136,48 +141,63 @@ final class Arpeggiator: ObservableObject {
  private func tick() {
  guard isRunning, !heldNotes.isEmpty else { return }
  
- // Release notes from previous tick (gate).
+ let interval = 1.0 / Double(rate)
+ let gateSeconds = interval * Double(gate)
+ 
+ switch mode {
+ case .chord:
+ // Play all notes simultaneously.
+ for note in heldNotes.sorted() {
+ engine?.noteOn(midiNote: note, velocity: 100)
+ notesSounding.insert(note)
+ }
+ // Release all chord notes after gate duration
+ DispatchQueue.main.asyncAfter(deadline: .now() + gateSeconds) { [weak self] in
+ self?.releaseSoundingNotes()
+ }
+ return // Don't advance position for chord mode
+ 
+ default:
+ // Release notes from previous tick
  releaseSoundingNotes()
  
  let sortedNotes = heldNotes.sorted()
  
+ let note: UInt8
  switch mode {
  case .up:
- playNote(sortedNotes[position % sortedNotes.count])
- 
+ note = sortedNotes[position % sortedNotes.count]
  case .down:
  let reversed = Array(sortedNotes.reversed())
- playNote(reversed[position % reversed.count])
- 
+ note = reversed[position % reversed.count]
  case .upDown:
- playUpDown(sortedNotes)
- 
+ note = playUpDownNote(sortedNotes)
  case .random:
- let randomNote = sortedNotes.randomElement() ?? 60
- playNote(randomNote)
- 
+ note = sortedNotes.randomElement() ?? 60
  case .ordered:
  guard !noteOrder.isEmpty else { return }
- playNote(noteOrder[position % noteOrder.count])
- 
- case .chord:
- // Play all notes simultaneously.
- for note in sortedNotes {
- engine?.noteOn(midiNote: note, velocity: 100)
- notesSounding.insert(note)
- }
- return // Don't advance position for chord mode
- 
+ note = noteOrder[position % noteOrder.count]
  case .noteRepeat:
- playNote(lastNote)
+ note = lastNote
+ default:
+ note = sortedNotes[position % sortedNotes.count]
+ }
+ 
+ playNote(note)
+ 
+ // Release this note after gate duration
+ DispatchQueue.main.asyncAfter(deadline: .now() + gateSeconds) { [weak self, note] in
+ self?.engine?.noteOff(midiNote: note)
+ self?.notesSounding.remove(note)
  }
  
  advancePosition()
  }
+ }
  
- private func playUpDown(_ sortedNotes: [UInt8]) {
+ private func playUpDownNote(_ sortedNotes: [UInt8]) -> UInt8 {
  let count = sortedNotes.count
- guard count > 0 else { return }
+ guard count > 0 else { return 60 }
  
  // Up-down pattern: 0, 1, 2, ..., n-1, n-2, ..., 1, 0, 1, ...
  let cycleLength = max(1, (count - 1) * 2)
@@ -190,7 +210,7 @@ final class Arpeggiator: ObservableObject {
  noteIndex = cycleLength - idx
  }
  
- playNote(sortedNotes[noteIndex])
+ return sortedNotes[noteIndex]
  }
  
  private func playNote(_ note: UInt8) {
