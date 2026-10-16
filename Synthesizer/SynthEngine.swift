@@ -51,32 +51,48 @@ final class SynthEngine: ObservableObject {
 
  /// Master volume (0...1).
  @Published var volume: Float = 0.5 {
- didSet { mainMixer.outputVolume = volume }
+ didSet { mainMixer.outputVolume = volume; saveSettings() }
  }
 
  /// Global transpose in semitones (-24...+24).
- @Published var transpose: Float = 0
+ @Published var transpose: Float = 0 {
+ didSet { saveSettings() }
+ }
 
  /// Current algorithm index (0..<32).
- @Published var algorithmIndex: Int = 0
+ @Published var algorithmIndex: Int = 0 {
+ didSet { saveSettings() }
+ }
 
  /// Feedback level (0...1) for algorithms that use feedback.
- @Published var feedbackLevel: Float = 0.5
+ @Published var feedbackLevel: Float = 0.5 {
+ didSet { saveSettings() }
+ }
 
  /// Oscillator sync enabled.
- @Published var oscillatorSync: Bool = false
+ @Published var oscillatorSync: Bool = false {
+ didSet { saveSettings() }
+ }
 
  /// LFO rate in Hz (0.01...20).
- @Published var lfoRate: Float = 5.0
+ @Published var lfoRate: Float = 5.0 {
+ didSet { saveSettings() }
+ }
 
  /// LFO waveform.
- @Published var lfoWave: LFOWave = .sine
+ @Published var lfoWave: LFOWave = .sine {
+ didSet { saveSettings() }
+ }
 
  /// Pitch bend range in semitones (0...24).
- @Published var pitchBendRange: Float = 2.0
+ @Published var pitchBendRange: Float = 2.0 {
+ didSet { saveSettings() }
+ }
 
  /// Pitch bend value (-1...1). -1 = down range, +1 = up range, 0 = center.
- @Published var pitchBendValue: Float = 0.0
+ @Published var pitchBendValue: Float = 0.0 {
+ didSet { saveSettings() }
+ }
 
  /// Per-operator parameters, indexed by operator (0..<6).
  /// Each entry: (ratio, detune, level, attack, decay, sustain, release).
@@ -87,61 +103,65 @@ final class SynthEngine: ObservableObject {
  (4.0, 0, 0.4, 0.1, 0.1, 0.5, 0.5), // Operator 4
  (5.0, 0, 0.3, 0.1, 0.1, 0.5, 0.5), // Operator 5
  (6.0, 0, 0.2, 0.1, 0.1, 0.5, 0.5), // Operator 6
- ]
+ ] {
+ didSet { saveSettings() }
+ }
 
  /// Per-operator on/off state.
- @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6)
+ @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6) {
+ didSet { saveSettings() }
+ }
 
  /// Effects chain (filter → distortion → chorus → delay → reverb → phaser).
  let effects: EffectsChain
 
  /// Effect enabled states.
  @Published var effectFilterEnabled: Bool = false {
- didSet { effects.setEnabled(.filter, enabled: effectFilterEnabled) }
+ didSet { effects.setEnabled(.filter, enabled: effectFilterEnabled); saveSettings() }
  }
  @Published var effectDistortionEnabled: Bool = false {
- didSet { effects.setEnabled(.distortion, enabled: effectDistortionEnabled) }
+ didSet { effects.setEnabled(.distortion, enabled: effectDistortionEnabled); saveSettings() }
  }
  @Published var effectChorusEnabled: Bool = false {
- didSet { effects.setEnabled(.chorus, enabled: effectChorusEnabled) }
+ didSet { effects.setEnabled(.chorus, enabled: effectChorusEnabled); saveSettings() }
  }
  @Published var effectDelayEnabled: Bool = false {
- didSet { effects.setEnabled(.delay, enabled: effectDelayEnabled) }
+ didSet { effects.setEnabled(.delay, enabled: effectDelayEnabled); saveSettings() }
  }
  @Published var effectReverbEnabled: Bool = false {
- didSet { effects.setEnabled(.reverb, enabled: effectReverbEnabled) }
+ didSet { effects.setEnabled(.reverb, enabled: effectReverbEnabled); saveSettings() }
  }
  @Published var effectPhaserEnabled: Bool = false {
- didSet { effects.setEnabled(.phaser, enabled: effectPhaserEnabled) }
+ didSet { effects.setEnabled(.phaser, enabled: effectPhaserEnabled); saveSettings() }
  }
 
  /// Effect amounts (wet/dry mix, 0...1).
  @Published var effectFilterAmount: Float = 0.5 {
- didSet { effects.setAmount(.filter, amount: effectFilterAmount) }
+ didSet { effects.setAmount(.filter, amount: effectFilterAmount); saveSettings() }
  }
  @Published var effectDistortionAmount: Float = 0.5 {
- didSet { effects.setAmount(.distortion, amount: effectDistortionAmount) }
+ didSet { effects.setAmount(.distortion, amount: effectDistortionAmount); saveSettings() }
  }
  @Published var effectChorusAmount: Float = 0.5 {
- didSet { effects.setAmount(.chorus, amount: effectChorusAmount) }
+ didSet { effects.setAmount(.chorus, amount: effectChorusAmount); saveSettings() }
  }
  @Published var effectDelayAmount: Float = 0.5 {
- didSet { effects.setAmount(.delay, amount: effectDelayAmount) }
+ didSet { effects.setAmount(.delay, amount: effectDelayAmount); saveSettings() }
  }
  @Published var effectReverbAmount: Float = 0.5 {
- didSet { effects.setAmount(.reverb, amount: effectReverbAmount) }
+ didSet { effects.setAmount(.reverb, amount: effectReverbAmount); saveSettings() }
  }
  @Published var effectPhaserAmount: Float = 0.5 {
- didSet { effects.setAmount(.phaser, amount: effectPhaserAmount) }
+ didSet { effects.setAmount(.phaser, amount: effectPhaserAmount); saveSettings() }
  }
 
  /// Filter cutoff frequency (Hz).
  @Published var effectFilterCutoff: Float = 5000 {
- didSet { effects.setFilterCutoff(effectFilterCutoff) }
+ didSet { effects.setFilterCutoff(effectFilterCutoff); saveSettings() }
  }
  /// Filter resonance (Q).
  @Published var effectFilterResonance: Float = 1.0 {
- didSet { effects.setFilterResonance(effectFilterResonance) }
+ didSet { effects.setFilterResonance(effectFilterResonance); saveSettings() }
  }
 
  /// Arpeggiator.
@@ -197,10 +217,14 @@ final class SynthEngine: ObservableObject {
 
  // Initial volume.
  mainMixer.outputVolume = volume
+
+ // Load saved settings.
+ loadSettings()
  }
 
  deinit {
  stop()
+ saveSettings()
  }
 
  // MARK: - Start / Stop
@@ -470,5 +494,142 @@ final class SynthEngine: ObservableObject {
  // Sequencer state.
  sequencer.tempo = preset.sequencerTempo
  sequencer.steps = preset.sequencerSteps
+ }
+
+ // MARK: - Settings persistence
+
+ private let settingsKey = "SynthEngineSettings"
+
+ /// Saves all engine parameters to UserDefaults.
+ func saveSettings() {
+ var dict: [String: Any] = [:]
+
+ // Global parameters
+ dict["volume"] = volume
+ dict["transpose"] = transpose
+ dict["algorithmIndex"] = algorithmIndex
+ dict["feedbackLevel"] = feedbackLevel
+ dict["oscillatorSync"] = oscillatorSync
+ dict["lfoRate"] = lfoRate
+ dict["lfoWave"] = lfoWave.rawValue
+ dict["pitchBendRange"] = pitchBendRange
+ dict["pitchBendValue"] = pitchBendValue
+
+ // Operator parameters
+ var opParams: [[Float]] = []
+ for params in operatorParams {
+ opParams.append([params.0, params.1, params.2, params.3, params.4, params.5, params.6])
+ }
+ dict["operatorParams"] = opParams
+
+ // Operator on/off
+ dict["operatorIsOn"] = operatorIsOn
+
+ // Effects
+ dict["effectFilterEnabled"] = effectFilterEnabled
+ dict["effectFilterAmount"] = effectFilterAmount
+ dict["effectFilterCutoff"] = effectFilterCutoff
+ dict["effectFilterResonance"] = effectFilterResonance
+ dict["effectDistortionEnabled"] = effectDistortionEnabled
+ dict["effectDistortionAmount"] = effectDistortionAmount
+ dict["effectChorusEnabled"] = effectChorusEnabled
+ dict["effectChorusAmount"] = effectChorusAmount
+ dict["effectDelayEnabled"] = effectDelayEnabled
+ dict["effectDelayAmount"] = effectDelayAmount
+ dict["effectReverbEnabled"] = effectReverbEnabled
+ dict["effectReverbAmount"] = effectReverbAmount
+ dict["effectPhaserEnabled"] = effectPhaserEnabled
+ dict["effectPhaserAmount"] = effectPhaserAmount
+
+ // Arpeggiator
+ dict["arpeggiatorMode"] = arpeggiator.mode.rawValue
+ dict["arpeggiatorRate"] = arpeggiator.rate
+ dict["arpeggiatorGate"] = arpeggiator.gate
+ dict["arpeggiatorOctaveRange"] = arpeggiator.octaveRange
+
+ // Sequencer
+ dict["sequencerTempo"] = sequencer.tempo
+ var seqSteps: [[String: Any]] = []
+ for step in sequencer.steps {
+ seqSteps.append([
+ "isOn": step.isOn,
+ "note": Int(step.note),
+ "velocity": step.velocity,
+ "gate": step.gate,
+ ])
+ }
+ dict["sequencerSteps"] = seqSteps
+
+ UserDefaults.standard.set(dict, forKey: settingsKey)
+ }
+
+ /// Loads engine parameters from UserDefaults.
+ private func loadSettings() {
+ guard let dict = UserDefaults.standard.dictionary(forKey: settingsKey) else { return }
+
+ // Global parameters
+ if let v = dict["volume"] as? Float { volume = v }
+ if let v = dict["transpose"] as? Float { transpose = v }
+ if let v = dict["algorithmIndex"] as? Int { algorithmIndex = v }
+ if let v = dict["feedbackLevel"] as? Float { feedbackLevel = v }
+ if let v = dict["oscillatorSync"] as? Bool { oscillatorSync = v }
+ if let v = dict["lfoRate"] as? Float { lfoRate = v }
+ if let v = dict["lfoWave"] as? Int { lfoWave = LFOWave(rawValue: v) ?? .sine }
+ if let v = dict["pitchBendRange"] as? Float { pitchBendRange = v }
+ if let v = dict["pitchBendValue"] as? Float { pitchBendValue = v }
+
+ // Operator parameters
+ if let opParams = dict["operatorParams"] as? [[Float]] {
+ for (index, params) in opParams.enumerated() where index < 6 && params.count == 7 {
+ operatorParams[index] = (params[0], params[1], params[2], params[3], params[4], params[5], params[6])
+ }
+ }
+
+ // Operator on/off
+ if let opIsOn = dict["operatorIsOn"] as? [Bool] {
+ for (index, isOn) in opIsOn.enumerated() where index < 6 {
+ operatorIsOn[index] = isOn
+ }
+ }
+
+ // Effects
+ if let v = dict["effectFilterEnabled"] as? Bool { effectFilterEnabled = v }
+ if let v = dict["effectFilterAmount"] as? Float { effectFilterAmount = v }
+ if let v = dict["effectFilterCutoff"] as? Float { effectFilterCutoff = v }
+ if let v = dict["effectFilterResonance"] as? Float { effectFilterResonance = v }
+ if let v = dict["effectDistortionEnabled"] as? Bool { effectDistortionEnabled = v }
+ if let v = dict["effectDistortionAmount"] as? Float { effectDistortionAmount = v }
+ if let v = dict["effectChorusEnabled"] as? Bool { effectChorusEnabled = v }
+ if let v = dict["effectChorusAmount"] as? Float { effectChorusAmount = v }
+ if let v = dict["effectDelayEnabled"] as? Bool { effectDelayEnabled = v }
+ if let v = dict["effectDelayAmount"] as? Float { effectDelayAmount = v }
+ if let v = dict["effectReverbEnabled"] as? Bool { effectReverbEnabled = v }
+ if let v = dict["effectReverbAmount"] as? Float { effectReverbAmount = v }
+ if let v = dict["effectPhaserEnabled"] as? Bool { effectPhaserEnabled = v }
+ if let v = dict["effectPhaserAmount"] as? Float { effectPhaserAmount = v }
+
+ // Rebuild effects chain with loaded states
+ effects.rebuildChain()
+
+ // Arpeggiator
+ if let v = dict["arpeggiatorMode"] as? Int {
+ arpeggiator.mode = ArpMode(rawValue: v) ?? .up
+ }
+ if let v = dict["arpeggiatorRate"] as? Float { arpeggiator.rate = v }
+ if let v = dict["arpeggiatorGate"] as? Float { arpeggiator.gate = v }
+ if let v = dict["arpeggiatorOctaveRange"] as? Int { arpeggiator.octaveRange = v }
+
+ // Sequencer
+ if let v = dict["sequencerTempo"] as? Float { sequencer.tempo = v }
+ if let seqSteps = dict["sequencerSteps"] as? [[String: Any]] {
+ for (index, stepDict) in seqSteps.enumerated() where index < Sequencer.stepCount {
+ var step = sequencer.steps[index]
+ if let isOn = stepDict["isOn"] as? Bool { step.isOn = isOn }
+ if let note = stepDict["note"] as? Int { step.note = UInt8(note) }
+ if let velocity = stepDict["velocity"] as? Float { step.velocity = velocity }
+ if let gate = stepDict["gate"] as? Float { step.gate = gate }
+ sequencer.steps[index] = step
+ }
+ }
  }
 }
