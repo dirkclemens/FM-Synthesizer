@@ -51,7 +51,7 @@ struct GlobalPanel: View {
  step: 0.01,
  formatter: { String(format: "%.2f", $0) }
  )
-
+ 
  Spacer()
  
  // Transpose
@@ -72,9 +72,6 @@ struct GlobalPanel: View {
  formatter: { String(format: "%.0f", $0) }
  )
  
- }
- 
- HStack(spacing: 16) {
  // Feedback
  Knob(
  title: "Feedback",
@@ -83,9 +80,7 @@ struct GlobalPanel: View {
  step: 0.01,
  formatter: { String(format: "%.2f", $0) }
  )
- }
-
- HStack(spacing: 16) {
+ 
  // LFO rate
  Knob(
  title: "LFO Rate",
@@ -94,7 +89,9 @@ struct GlobalPanel: View {
  step: 0.01,
  formatter: { String(format: "%.2f", $0) }
  )
-
+ }
+ 
+ HStack { 
  // LFO wave
  Picker("LFO Wave", selection: $engine.lfoWave) {
  ForEach(LFOWave.allCases, id: \.self) { wave in
@@ -103,13 +100,13 @@ struct GlobalPanel: View {
  }
  .pickerStyle(.segmented)
  .frame(maxWidth: .infinity)
- }
-
+ 
  // Oscillator sync
  HStack {
  Toggle("Oscillator Sync", isOn: $engine.oscillatorSync)
  .font(.caption)
  Spacer()
+ }
  }
  }
  .padding(10)
