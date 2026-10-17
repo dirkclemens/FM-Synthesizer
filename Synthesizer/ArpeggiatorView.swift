@@ -18,7 +18,7 @@ struct ArpeggiatorView: View {
  ) {
  VStack(alignment: .leading, spacing: 12) {
  // On/Off toggle
- HStack {
+ HStack(spacing: 16) {
  Toggle("Arpeggiator", isOn: Binding(
  get: { arpeggiator.isRunning },
  set: { newValue in
@@ -30,11 +30,12 @@ struct ArpeggiatorView: View {
  }
  ))
  .font(.caption)
- Toggle("Arpeggiator", isOn: .constant(false))
+ 
+ //Arpeggiator
+ Toggle("", isOn: .constant(false))
  .opacity(0)
- Spacer()
- }
-
+// Spacer()
+ 
  // Mode picker
  Picker("Mode", selection: $arpeggiator.mode) {
  ForEach(ArpMode.allCases, id: \.self) { mode in
@@ -43,7 +44,8 @@ struct ArpeggiatorView: View {
  }
  .pickerStyle(.segmented)
  .frame(maxWidth: .infinity)
-
+ }
+ 
  // Rate and gate
  HStack(spacing: 16) {
  Knob(
@@ -56,8 +58,8 @@ struct ArpeggiatorView: View {
  step: 0.1,
  formatter: { String(format: "%.1f", $0) }
  )
- .frame(maxWidth: .infinity)
-
+// .frame(maxWidth: .infinity)
+ 
  Knob(
  title: "Gate",
  value: Binding(
@@ -68,9 +70,8 @@ struct ArpeggiatorView: View {
  step: 0.05,
  formatter: { String(format: "%.2f", $0) }
  )
- .frame(maxWidth: .infinity)
- }
-
+// .frame(maxWidth: .infinity)
+ 
  // Octave range
  Knob(
  title: "Octaves",
@@ -82,6 +83,8 @@ struct ArpeggiatorView: View {
  step: 1,
  formatter: { String(format: "%.0f", $0) }
  )
+// .frame(maxWidth: .infinity)
+ }
  }
  }
  }

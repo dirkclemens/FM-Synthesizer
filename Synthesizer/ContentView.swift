@@ -22,27 +22,28 @@ struct ContentView: View {
  MIDIConnectionView(midiManager: midiManager, engine: engine)
 
  Divider().padding(6)
-
+ 
+ HStack(alignment: .top, spacing: 12) {
+ // MARK: Global controls
+ GlobalPanel(engine: engine)
  // MARK: Oscilloscope
  OscilloscopeView(engine: engine)
-
+ }
+ 
  Divider().padding(6)
 
  // MARK: Arpeggiator + Sequencer
- HStack(spacing: 12) {
+ HStack(alignment: .top, spacing: 12) {
  ArpeggiatorView(arpeggiator: engine.arpeggiator)
  SequencerView(sequencer: engine.sequencer)
  }
 
- Divider().padding(6)
-
- // MARK: Global controls
- GlobalPanel(engine: engine)
+// Divider().padding(6)
 
  Divider().padding(6)
 
  // MARK: Algorithm matrix + operator panels
- HStack(spacing: 12) {
+ HStack(alignment: .top, spacing: 12) {
  // Algorithm + operator matrix visualization
  AlgorithmMatrixView(algorithmIndex: $engine.algorithmIndex)
  .frame(maxWidth: 260)
@@ -61,7 +62,7 @@ struct ContentView: View {
  Divider().padding(6)
 
  // MARK: Keyboard
- HStack(alignment: .center, spacing: 0) {
+ HStack(alignment: .top, spacing: 0) {
  Spacer()
  KeyboardView(
  onKeyDown: { note in

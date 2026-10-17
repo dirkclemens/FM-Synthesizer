@@ -9,7 +9,7 @@
 import SwiftUI
 
 struct OscilloscopeView: View {
- let engine: SynthEngine
+ @ObservedObject var engine: SynthEngine
 
  private let displaySamples = 256
  @State private var refreshTick: Int = 0
@@ -19,8 +19,8 @@ struct OscilloscopeView: View {
  headerView
 
  OscilloscopeDisplayView(
- samples: engine.scopeSnapshot,
- count: min(engine.scopeSnapshot.count, displaySamples)
+ samples: engine.scopeSamples,
+ count: min(engine.scopeSamples.count, displaySamples)
  )
  .frame(height: 140)
  .padding(8)

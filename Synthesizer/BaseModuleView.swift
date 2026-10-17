@@ -41,8 +41,8 @@ struct BaseModuleView<Content: View>: View {
  .foregroundColor(.primary)
  Spacer()
  }
- .padding(.horizontal, 10)
- .padding(.top, 10)
+ .padding(.horizontal, 6)
+ .padding(.top, 6)
  .background(
  RoundedRectangle(cornerRadius: 8)
  .fill(Color.white.opacity(0.05))
