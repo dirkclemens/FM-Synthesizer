@@ -38,8 +38,6 @@ struct ContentView: View {
  SequencerView(sequencer: engine.sequencer)
  }
 
-// Divider().padding(6)
-
  Divider().padding(6)
 
  // MARK: Algorithm matrix + operator panels

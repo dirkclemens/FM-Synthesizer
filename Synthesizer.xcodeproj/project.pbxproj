@@ -104,6 +104,19 @@
 		4332DD8C3083D32C00D70188 /* FMAudio */ = {
 			isa = PBXGroup;
 			children = (
+				FD6686702968E70000FD8C4A /* Operator.swift */,
+				4332DD893083CEC400D70188 /* Oscillator.swift */,
+				FD6686742968E70000FD8C4A /* Algorithms.swift */,
+				FD6686762968E70000FD8C4A /* SynthEngine.swift */,
+				FD66867A2968E70000FD8C4A /* LFO.swift */,
+				FD66868A2968E70000FD8C4A /* Preset.swift */,
+				FD66868C2968E70000FD8C4A /* PresetBank.swift */,
+				FD6686902968E70000FD8C4A /* Effects.swift */,
+				FD6686922968E70000FD8C4A /* Arpeggiator.swift */,
+				FD6686942968E70000FD8C4A /* Sequencer.swift */,
+				FD66869A2968E70000FD8C4A /* MIDIManager.swift */,
+				FD66869C2968E70000FD8C4A /* MacKeyboardHandler.swift */,
+				FD6686722968E70000FD8C4A /* Voice.swift */,
 			);
 			path = FMAudio;
 			sourceTree = "<group>";
@@ -133,19 +146,6 @@
 				4332DD8B3083D25A00D70188 /* Views */,
 				FD66863D2968D8A700FD8C4A /* Assets.xcassets */,
 				FD6686422968D8A700FD8C4A /* Synthesizer.entitlements */,
-				FD6686702968E70000FD8C4A /* Operator.swift */,
-				4332DD893083CEC400D70188 /* Oscillator.swift */,
-				FD6686742968E70000FD8C4A /* Algorithms.swift */,
-				FD6686762968E70000FD8C4A /* SynthEngine.swift */,
-				FD66867A2968E70000FD8C4A /* LFO.swift */,
-				FD66868A2968E70000FD8C4A /* Preset.swift */,
-				FD66868C2968E70000FD8C4A /* PresetBank.swift */,
-				FD6686902968E70000FD8C4A /* Effects.swift */,
-				FD6686922968E70000FD8C4A /* Arpeggiator.swift */,
-				FD6686942968E70000FD8C4A /* Sequencer.swift */,
-				FD66869A2968E70000FD8C4A /* MIDIManager.swift */,
-				FD66869C2968E70000FD8C4A /* MacKeyboardHandler.swift */,
-				FD6686722968E70000FD8C4A /* Voice.swift */,
 			);
 			path = Synthesizer;
 			sourceTree = "<group>";
