@@ -21,7 +21,7 @@ struct ContentView: View {
  // MARK: Preset browser
 // PresetBrowserView(bank: bank, engine: engine)
 
- Divider()
+ Divider().padding(6)
 
  // MARK: MIDI Connection
  HStack(spacing: 12) {
@@ -83,24 +83,42 @@ struct ContentView: View {
  .controlSize(.small)
  .help("Restore previously saved engine state")
  }
+ .padding(10)
+ .background(
+ RoundedRectangle(cornerRadius: 10)
+ .fill(Color(NSColor.controlBackgroundColor).opacity(0.4))
+ )
+ .overlay(
+ RoundedRectangle(cornerRadius: 10)
+ .stroke(Color.blue.opacity(0.4), lineWidth: 1.5)
+ )
+ .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
 
+ // MARK: Oscilloscope
+ OscilloscopeView(engine: engine)
+
+ Divider().padding(6)
+
+ 
  // MARK: Arpeggiator + Sequencer
  HStack(spacing: 12) {
  ArpeggiatorView(arpeggiator: engine.arpeggiator)
  SequencerView(sequencer: engine.sequencer)
  }
 
- Divider()
+ Divider().padding(6)
+
 
  // MARK: Global controls
  GlobalPanel(engine: engine)
 
- Divider()
+ Divider().padding(6)
 
- // MARK: Operator matrix + operator panels
+
+ // MARK: Algorithm matrix + operator panels
  HStack(spacing: 12) {
- // Operator matrix (6x6 visualization)
- OperatorMatrixView(algorithm: fmAlgorithms[engine.algorithmIndex])
+ // Algorithm + operator matrix visualization
+ AlgorithmMatrixView(algorithmIndex: $engine.algorithmIndex)
  .frame(maxWidth: 260)
 
  Divider()
@@ -114,7 +132,7 @@ struct ContentView: View {
  .frame(maxWidth: .infinity)
  }
 
- Divider()
+ Divider().padding(6)
 
  // MARK: Keyboard
  HStack(alignment: .center, spacing: 0) {

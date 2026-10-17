@@ -42,6 +42,7 @@ struct GlobalPanel: View {
  )
 
  VStack(alignment: .leading, spacing: 12) {
+ HStack(spacing: 16) {
  // Volume
  Knob(
  title: "Volume",
@@ -51,7 +52,8 @@ struct GlobalPanel: View {
  formatter: { String(format: "%.2f", $0) }
  )
 
- VStack(spacing: 16) {
+ Spacer()
+ 
  // Transpose
  Knob(
  title: "Transpose",
@@ -60,7 +62,7 @@ struct GlobalPanel: View {
  step: 1,
  formatter: { String(format: "%.0f", $0) }
  )
-
+ 
  // Pitch bend range
  Knob(
  title: "Bend Range",
@@ -69,13 +71,10 @@ struct GlobalPanel: View {
  step: 1,
  formatter: { String(format: "%.0f", $0) }
  )
+ 
  }
-
+ 
  HStack(spacing: 16) {
- // Algorithm selector
- AlgorithmSelector(algorithmIndex: $engine.algorithmIndex)
- .frame(maxWidth: .infinity)
-
  // Feedback
  Knob(
  title: "Feedback",

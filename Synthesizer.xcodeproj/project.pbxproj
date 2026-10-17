@@ -23,8 +23,6 @@
 		FD66867D2968E70000FD8C4A /* Knob.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66867C2968E70000FD8C4A /* Knob.swift */; };
 		FD66867F2968E70000FD8C4A /* LabeledSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66867E2968E70000FD8C4A /* LabeledSlider.swift */; };
 		FD6686812968E70000FD8C4A /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686802968E70000FD8C4A /* KeyboardView.swift */; };
-		FD6686832968E70000FD8C4A /* OperatorMatrixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686822968E70000FD8C4A /* OperatorMatrixView.swift */; };
-		FD6686852968E70000FD8C4A /* AlgorithmSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */; };
 		FD6686872968E70000FD8C4A /* OperatorPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686862968E70000FD8C4A /* OperatorPanel.swift */; };
 		FD6686892968E70000FD8C4A /* GlobalPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686882968E70000FD8C4A /* GlobalPanel.swift */; };
 		FD66868B2968E70000FD8C4A /* Preset.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66868A2968E70000FD8C4A /* Preset.swift */; };
@@ -37,6 +35,8 @@
 		FD6686992968E70000FD8C4A /* SequencerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686982968E70000FD8C4A /* SequencerView.swift */; };
 		FD66869B2968E70000FD8C4A /* MIDIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66869A2968E70000FD8C4A /* MIDIManager.swift */; };
 		FD66869D2968E70000FD8C4A /* MacKeyboardHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66869C2968E70000FD8C4A /* MacKeyboardHandler.swift */; };
+		FD6686AD2968E70000FD8C4A /* AlgorithmMatrixView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686AA2968E70000FD8C4A /* AlgorithmMatrixView.swift */; };
+		FD6686AE2968E70000FD8C4A /* OscilloscopeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686AC2968E70000FD8C4A /* OscilloscopeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,8 +77,6 @@
 		FD66867C2968E70000FD8C4A /* Knob.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Knob.swift; sourceTree = "<group>"; };
 		FD66867E2968E70000FD8C4A /* LabeledSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LabeledSlider.swift; sourceTree = "<group>"; };
 		FD6686802968E70000FD8C4A /* KeyboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardView.swift; sourceTree = "<group>"; };
-		FD6686822968E70000FD8C4A /* OperatorMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorMatrixView.swift; sourceTree = "<group>"; };
-		FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmSelector.swift; sourceTree = "<group>"; };
 		FD6686862968E70000FD8C4A /* OperatorPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OperatorPanel.swift; sourceTree = "<group>"; };
 		FD6686882968E70000FD8C4A /* GlobalPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalPanel.swift; sourceTree = "<group>"; };
 		FD66868A2968E70000FD8C4A /* Preset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preset.swift; sourceTree = "<group>"; };
@@ -91,6 +89,8 @@
 		FD6686982968E70000FD8C4A /* SequencerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SequencerView.swift; sourceTree = "<group>"; };
 		FD66869A2968E70000FD8C4A /* MIDIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDIManager.swift; sourceTree = "<group>"; };
 		FD66869C2968E70000FD8C4A /* MacKeyboardHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacKeyboardHandler.swift; sourceTree = "<group>"; };
+		FD6686AA2968E70000FD8C4A /* AlgorithmMatrixView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmMatrixView.swift; sourceTree = "<group>"; };
+		FD6686AC2968E70000FD8C4A /* OscilloscopeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OscilloscopeView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -147,8 +147,6 @@
 				FD66867C2968E70000FD8C4A /* Knob.swift */,
 				FD66867E2968E70000FD8C4A /* LabeledSlider.swift */,
 				FD6686802968E70000FD8C4A /* KeyboardView.swift */,
-				FD6686822968E70000FD8C4A /* OperatorMatrixView.swift */,
-				FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */,
 				FD6686862968E70000FD8C4A /* OperatorPanel.swift */,
 				FD6686882968E70000FD8C4A /* GlobalPanel.swift */,
 				FD66868A2968E70000FD8C4A /* Preset.swift */,
@@ -162,6 +160,8 @@
 				FD66869A2968E70000FD8C4A /* MIDIManager.swift */,
 				FD66869C2968E70000FD8C4A /* MacKeyboardHandler.swift */,
 				FD6686722968E70000FD8C4A /* Voice.swift */,
+				FD6686AA2968E70000FD8C4A /* AlgorithmMatrixView.swift */,
+				FD6686AC2968E70000FD8C4A /* OscilloscopeView.swift */,
 			);
 			path = Synthesizer;
 			sourceTree = "<group>";
@@ -317,8 +317,6 @@
 				FD66867D2968E70000FD8C4A /* Knob.swift in Sources */,
 				FD66867F2968E70000FD8C4A /* LabeledSlider.swift in Sources */,
 				FD6686812968E70000FD8C4A /* KeyboardView.swift in Sources */,
-				FD6686832968E70000FD8C4A /* OperatorMatrixView.swift in Sources */,
-				FD6686852968E70000FD8C4A /* AlgorithmSelector.swift in Sources */,
 				FD6686872968E70000FD8C4A /* OperatorPanel.swift in Sources */,
 				FD6686892968E70000FD8C4A /* GlobalPanel.swift in Sources */,
 				FD66868B2968E70000FD8C4A /* Preset.swift in Sources */,
@@ -331,6 +329,8 @@
 				FD6686992968E70000FD8C4A /* SequencerView.swift in Sources */,
 				FD66869B2968E70000FD8C4A /* MIDIManager.swift in Sources */,
 				FD66869D2968E70000FD8C4A /* MacKeyboardHandler.swift in Sources */,
+				FD6686AD2968E70000FD8C4A /* AlgorithmMatrixView.swift in Sources */,
+				FD6686AE2968E70000FD8C4A /* OscilloscopeView.swift in Sources */,
 			);
 		};
 		FD6686432968D8A700FD8C4A /* Sources */ = {
@@ -369,7 +369,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -401,7 +401,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -415,7 +415,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -432,7 +432,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
@@ -464,7 +464,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
-				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_C_LANGUAGE_STANDARD = "compiler-default";
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -472,7 +472,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 12.1;
+				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -487,6 +487,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Synthesizer/Synthesizer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -496,6 +497,7 @@
 				DEVELOPMENT_TEAM = BXZ479CGUZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "FM Synth";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -516,6 +518,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Synthesizer/Synthesizer.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -525,6 +528,7 @@
 				DEVELOPMENT_TEAM = BXZ479CGUZ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "FM Synth";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (

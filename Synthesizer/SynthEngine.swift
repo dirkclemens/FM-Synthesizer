@@ -197,6 +197,9 @@ final class SynthEngine: ObservableObject {
 
  // Initial volume.
  mainMixer.outputVolume = volume
+
+ // Set up audio tap for oscilloscope visualization.
+ setupScopeTap()
  }
 
  deinit {
@@ -216,6 +219,43 @@ final class SynthEngine: ObservableObject {
  guard isRunning else { return }
  audioEngine.stop()
  isRunning = false
+ }
+
+ // MARK: - Audio scope (oscilloscope)
+
+ /// Latest waveform samples for oscilloscope display.
+ /// Thread-safe circular buffer of the mixed output.
+ @Published var scopeSamples: [Float] = Array(repeating: 0, count: 512)
+
+ /// Audio tap that captures the mixed output for visualization.
+ private var scopeTap: AVAudioSourceNode?
+
+ /// Sets up the audio tap on the output node to capture samples for the oscilloscope.
+ private func setupScopeTap() {
+ let tapNode = AVAudioSourceNode { [weak self] _, _, frameCount, audioBufferList -> OSStatus in
+ self?.captureScopeSamples(frameCount: Int(frameCount), audioBufferList: audioBufferList) ?? noErr
+ }
+ scopeTap = tapNode
+ audioEngine.attach(tapNode)
+ audioEngine.connect(tapNode, to: outputNode, format: nil)
+ }
+
+ /// Captures samples from the audio render callback into the scope buffer.
+ private func captureScopeSamples(frameCount: Int, audioBufferList: UnsafeMutablePointer<AudioBufferList>) -> OSStatus {
+ let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
+ guard let firstBuffer = ablPointer.first,
+ let data = firstBuffer.mData?.assumingMemoryBound(to: Float.self) else {
+ return noErr
+ }
+
+ let count = min(frameCount, 512)
+
+ // Copy samples into the scope buffer (circular)
+ for i in 0..<count {
+ scopeSamples[i] = data[i]
+ }
+
+ return noErr
  }
 
  // MARK: - Voice rendering (audio thread callback)
