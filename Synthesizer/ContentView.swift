@@ -19,10 +19,11 @@ struct ContentView: View {
  var body: some View {
  VStack(spacing: 0) {
  // MARK: Preset browser
-// PresetBrowserView(bank: bank, engine: engine)
-
- Divider().padding(6)
-
+ // PresetBrowserView(bank: bank, engine: engine)
+ 
+ Spacer().padding(6)
+ 
+ HStack(spacing: 12) {
  // MARK: MIDI Connection
  HStack(spacing: 12) {
  Text("MIDI Input")
@@ -93,10 +94,14 @@ struct ContentView: View {
  .stroke(Color.blue.opacity(0.4), lineWidth: 1.5)
  )
  .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
-
+ 
+ Divider().padding(6)
+ 
  // MARK: Oscilloscope
  OscilloscopeView(engine: engine)
-
+ 
+ }
+ 
  Divider().padding(6)
 
  

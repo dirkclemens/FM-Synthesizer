@@ -225,10 +225,21 @@ final class SynthEngine: ObservableObject {
 
  /// Latest waveform samples for oscilloscope display.
  /// Thread-safe circular buffer of the mixed output.
- @Published var scopeSamples: [Float] = Array(repeating: 0, count: 512)
+ /// Access via scopeSnapshot() for thread-safe reads.
+ private var scopeSamples: [Float] = Array(repeating: 0, count: 512)
+
+ /// Lock for thread-safe access to scopeSamples.
+ private let scopeLock = NSLock()
 
  /// Audio tap that captures the mixed output for visualization.
  private var scopeTap: AVAudioSourceNode?
+
+ /// Thread-safe snapshot of scope samples for UI consumption.
+ var scopeSnapshot: [Float] {
+ scopeLock.lock()
+ defer { scopeLock.unlock() }
+ return scopeSamples
+ }
 
  /// Sets up the audio tap on the output node to capture samples for the oscilloscope.
  private func setupScopeTap() {
