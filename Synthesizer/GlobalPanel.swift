@@ -11,36 +11,11 @@ struct GlobalPanel: View {
  @ObservedObject var engine: SynthEngine
 
  var body: some View {
- VStack(alignment: .leading, spacing: 0) {
- // Header
- HStack {
- ZStack {
- Circle()
- .fill(Color.blue.opacity(0.2))
- .frame(width: 24, height: 24)
- Circle()
- .stroke(Color.blue, lineWidth: 2)
- .frame(width: 24, height: 24)
- Text("G")
- .font(.system(size: 10, weight: .bold, design: .monospaced))
- .foregroundColor(.blue)
- }
- Text("Global")
- .font(.headline)
- .foregroundColor(.primary)
- Spacer()
- }
- .padding(.horizontal, 10)
- .padding(.top, 10)
- .background(
- RoundedRectangle(cornerRadius: 8)
- .fill(Color.white.opacity(0.05))
- )
- .overlay(
- RoundedRectangle(cornerRadius: 8)
- .stroke(Color.blue.opacity(0.3), lineWidth: 1)
- )
-
+ BaseModuleView(
+ title: "Global",
+ icon: "G",
+ color: .blue
+ ) {
  VStack(alignment: .leading, spacing: 12) {
  HStack(spacing: 16) {
  // Volume
@@ -51,9 +26,7 @@ struct GlobalPanel: View {
  step: 0.01,
  formatter: { String(format: "%.2f", $0) }
  )
- 
- Spacer()
- 
+
  // Transpose
  Knob(
  title: "Transpose",
@@ -62,7 +35,7 @@ struct GlobalPanel: View {
  step: 1,
  formatter: { String(format: "%.0f", $0) }
  )
- 
+
  // Pitch bend range
  Knob(
  title: "Bend Range",
@@ -71,7 +44,7 @@ struct GlobalPanel: View {
  step: 1,
  formatter: { String(format: "%.0f", $0) }
  )
- 
+
  // Feedback
  Knob(
  title: "Feedback",
@@ -80,7 +53,7 @@ struct GlobalPanel: View {
  step: 0.01,
  formatter: { String(format: "%.2f", $0) }
  )
- 
+
  // LFO rate
  Knob(
  title: "LFO Rate",
@@ -90,8 +63,8 @@ struct GlobalPanel: View {
  formatter: { String(format: "%.2f", $0) }
  )
  }
- 
- HStack { 
+
+ HStack {
  // LFO wave
  Picker("LFO Wave", selection: $engine.lfoWave) {
  ForEach(LFOWave.allCases, id: \.self) { wave in
@@ -100,7 +73,7 @@ struct GlobalPanel: View {
  }
  .pickerStyle(.segmented)
  .frame(maxWidth: .infinity)
- 
+
  // Oscillator sync
  HStack {
  Toggle("Oscillator Sync", isOn: $engine.oscillatorSync)
@@ -109,17 +82,7 @@ struct GlobalPanel: View {
  }
  }
  }
- .padding(10)
  }
- .background(
- RoundedRectangle(cornerRadius: 10)
- .fill(Color(NSColor.controlBackgroundColor).opacity(0.4))
- )
- .overlay(
- RoundedRectangle(cornerRadius: 10)
- .stroke(Color.blue.opacity(0.4), lineWidth: 1.5)
- )
- .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
  }
 
  private func waveLabel(_ wave: LFOWave) -> String {

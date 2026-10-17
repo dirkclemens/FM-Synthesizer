@@ -195,6 +195,11 @@ final class SynthEngine: ObservableObject {
  // Build initial chain (all effects disabled = mixer → output).
  effects.rebuildChain()
 
+ // Reconnect voice source nodes to mixer (rebuildChain disconnected them)
+ for node in voiceNodes {
+ audioEngine.connect(node, to: mainMixer, format: nil)
+ }
+
  // Initial volume.
  mainMixer.outputVolume = volume
 

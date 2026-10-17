@@ -18,36 +18,11 @@ struct PresetBrowserView: View {
  let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 8)
 
  var body: some View {
- VStack(alignment: .leading, spacing: 0) {
- // Header
- HStack {
- ZStack {
- Circle()
- .fill(Color.yellow.opacity(0.2))
- .frame(width: 24, height: 24)
- Circle()
- .stroke(Color.yellow, lineWidth: 2)
- .frame(width: 24, height: 24)
- Text("P")
- .font(.system(size: 10, weight: .bold, design: .monospaced))
- .foregroundColor(.yellow)
- }
- Text("Presets (128 slots)")
- .font(.headline)
- .foregroundColor(.primary)
- Spacer()
- }
- .padding(.horizontal, 10)
- .padding(.top, 10)
- .background(
- RoundedRectangle(cornerRadius: 8)
- .fill(Color.white.opacity(0.05))
- )
- .overlay(
- RoundedRectangle(cornerRadius: 8)
- .stroke(Color.yellow.opacity(0.3), lineWidth: 1)
- )
-
+ BaseModuleView(
+ title: "Presets",
+ icon: "P",
+ color: .yellow
+ ) {
  VStack(alignment: .leading, spacing: 10) {
  // Slot grid
  LazyVGrid(columns: columns, spacing: 6) {
@@ -103,22 +78,18 @@ struct PresetBrowserView: View {
  .foregroundColor(.secondary)
  }
  }
- .padding(10)
  }
- .background(
- RoundedRectangle(cornerRadius: 10)
- .fill(Color(NSColor.controlBackgroundColor).opacity(0.4))
- )
- .overlay(
- RoundedRectangle(cornerRadius: 10)
- .stroke(Color.yellow.opacity(0.4), lineWidth: 1.5)
- )
- .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
+ }
+
+ /// Whether the slot is a factory preset slot (first N slots).
+ private func isFactorySlot(_ slot: Int) -> Bool {
+ return slot < Preset.factory.count
+ }
 
  // Rename overlay
- if let slot = renamingSlot {
+ var renameOverlay: some View {
  VStack(spacing: 8) {
- Text("Rename Slot \(slot + 1)")
+ Text("Rename Slot \(renamingSlot ?? 0 + 1)")
  .font(.headline)
  TextField("Preset name", text: $renameText)
  .textFieldStyle(.roundedBorder)
@@ -128,7 +99,7 @@ struct PresetBrowserView: View {
  }
  .buttonStyle(.bordered)
  Button("Save") {
- bank.renamePreset(at: slot, to: renameText)
+ bank.renamePreset(at: renamingSlot ?? 0, to: renameText)
  renamingSlot = nil
  }
  .buttonStyle(.borderedProminent)
@@ -140,16 +111,9 @@ struct PresetBrowserView: View {
  .cornerRadius(8)
  .shadow(radius: 4)
  }
- }
 
- /// Whether the slot is a factory preset slot (first N slots).
- private func isFactorySlot(_ slot: Int) -> Bool {
- return slot < Preset.factory.count
- }
-}
-
-/// A single preset slot button.
-struct PresetSlotView: View {
+ /// A single preset slot button.
+ struct PresetSlotView: View {
  let slot: Int
  let preset: Preset?
  let isSelected: Bool
@@ -209,6 +173,7 @@ struct PresetSlotView: View {
  RoundedRectangle(cornerRadius: 4)
  .stroke(Color.blue.opacity(0.5), lineWidth: isSelected ? 2 : 0)
  )
+ }
  }
 }
 

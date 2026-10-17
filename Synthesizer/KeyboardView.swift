@@ -14,7 +14,7 @@ let keyboardBlackKeyWidth: CGFloat = 14
 let keyboardBlackKeyHeight: CGFloat = 75
 
 /// MIDI note range for the 27-key keyboard.
-let keyboardNoteRange: ClosedRange<UInt8> = 36...62
+let keyboardNoteRange: ClosedRange<UInt8> = 36...74
 
 /// Whether a MIDI note is a white key.
 func isWhiteKey(midiCode: Int) -> Bool {

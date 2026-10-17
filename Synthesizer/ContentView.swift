@@ -18,11 +18,6 @@ struct ContentView: View {
 
  var body: some View {
  VStack(spacing: 0) {
- // MARK: Preset browser
- // PresetBrowserView(bank: bank, engine: engine)
- 
- Spacer().padding(6)
-
  // MARK: MIDI Connection
  MIDIConnectionView(midiManager: midiManager, engine: engine)
 
@@ -41,12 +36,10 @@ struct ContentView: View {
 
  Divider().padding(6)
 
-
  // MARK: Global controls
  GlobalPanel(engine: engine)
 
  Divider().padding(6)
-
 
  // MARK: Algorithm matrix + operator panels
  HStack(spacing: 12) {

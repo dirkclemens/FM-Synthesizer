@@ -5,7 +5,7 @@
 // Per-operator controls: on/off, ratio, detune, level, ADSR.
 // Binds to SynthEngine.operatorParams.
 //
-
+//
 import SwiftUI
 
 struct OperatorPanel: View {
@@ -16,38 +16,12 @@ struct OperatorPanel: View {
  let params = engine.operatorParams[safe: operatorIndex] ??
  (1.0, 0, 1.0, 0.1, 0.1, 0.5, 0.5)
 
- VStack(alignment: .leading, spacing: 0) {
- // Header with operator number and color
- HStack {
- ZStack {
- Circle()
- .fill(operatorColor.opacity(0.2))
- .frame(width: 24, height: 24)
- Circle()
- .stroke(operatorColor, lineWidth: 2)
- .frame(width: 24, height: 24)
- Text("\(operatorIndex + 1)")
- .font(.system(size: 10, weight: .bold, design: .monospaced))
- .foregroundColor(operatorColor)
- }
- Text("Operator \(operatorIndex + 1)")
- .font(.headline)
- .foregroundColor(.primary)
- Spacer()
- }
- .padding(.horizontal, 10)
- .padding(.top, 10)
- .background(
- RoundedRectangle(cornerRadius: 8)
- .fill(Color.white.opacity(0.05))
- )
- .overlay(
- RoundedRectangle(cornerRadius: 8)
- .stroke(operatorColor.opacity(0.3), lineWidth: 1)
- )
-
+ BaseModuleView(
+ title: "Operator \(operatorIndex + 1)",
+ icon: "O\(operatorIndex + 1)",
+ color: operatorColor
+ ) {
  VStack(alignment: .leading, spacing: 8) {
- HStack(spacing: 12) {
  // Ratio
  Knob(
  title: "Ratio",
@@ -59,9 +33,7 @@ struct OperatorPanel: View {
  step: 0.5,
  formatter: { String(format: "%.1f", $0) }
  )
- 
- Spacer()
- 
+
  // Detune
  Knob(
  title: "Detune",
@@ -73,7 +45,7 @@ struct OperatorPanel: View {
  step: 1,
  formatter: { String(format: "%.0f", $0) }
  )
- 
+
  // Level
  Knob(
  title: "Level",
@@ -85,12 +57,11 @@ struct OperatorPanel: View {
  step: 0.01,
  formatter: { String(format: "%.2f", $0) }
  )
- }
 
  // ADSR
  HStack(spacing: 12) {
  Knob(
- title: "Attack",
+ title: "A",
  value: Binding(
  get: { params.3 },
  set: { newValue in updateOperatorParam(index: 3, value: newValue) }
@@ -102,7 +73,7 @@ struct OperatorPanel: View {
  .frame(maxWidth: .infinity)
 
  Knob(
- title: "Decay",
+ title: "D",
  value: Binding(
  get: { params.4 },
  set: { newValue in updateOperatorParam(index: 4, value: newValue) }
@@ -114,7 +85,7 @@ struct OperatorPanel: View {
  .frame(maxWidth: .infinity)
 
  Knob(
- title: "Sustain",
+ title: "S",
  value: Binding(
  get: { params.5 },
  set: { newValue in updateOperatorParam(index: 5, value: newValue) }
@@ -126,7 +97,7 @@ struct OperatorPanel: View {
  .frame(maxWidth: .infinity)
 
  Knob(
- title: "Release",
+ title: "R",
  value: Binding(
  get: { params.6 },
  set: { newValue in updateOperatorParam(index: 6, value: newValue) }
@@ -138,17 +109,7 @@ struct OperatorPanel: View {
  .frame(maxWidth: .infinity)
  }
  }
- .padding(10)
  }
- .background(
- RoundedRectangle(cornerRadius: 10)
- .fill(Color(NSColor.controlBackgroundColor).opacity(0.4))
- )
- .overlay(
- RoundedRectangle(cornerRadius: 10)
- .stroke(operatorColor.opacity(0.4), lineWidth: 1.5)
- )
- .shadow(color: Color.black.opacity(0.15), radius: 4, x: 0, y: 2)
  }
 
  private var operatorColor: Color {
