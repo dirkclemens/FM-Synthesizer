@@ -1,76 +1,63 @@
-# Step 4 — UI v1 (Native macOS SwiftUI)
+# Step 4 — UI v1 (Native macOS SwiftUI) (COMPLETE — v0.1)
 
-**Suggested LLM:** Claude Sonnet 4 / Nemotron (strong SwiftUI) 
-**Status:** todo 
+**Status:** complete
 **Depends on:** Step 1 complete (Step 2 recommended but not strictly required)
 
 ## Goal
-Build a resizable native macOS SwiftUI UI to play and program the FM synth: keyboard, operator matrix visualization, per-operator knobs, algorithm selector, global controls. No preset browser yet (Step 5).
+Build a resizable native macOS SwiftUI UI to play and program the FM synth: keyboard, operator matrix visualization, per-operator knobs, algorithm selector, global controls.
 
 ## Prerequisites
 - `SynthEngine` with published parameters
-- Native macOS SwiftUI (user choice: simpler, lower risk)
+- Native macOS SwiftUI
 
-## Deliverables
+## Deliverables (ALL COMPLETE)
 - `ContentView.swift` — main resizable window layout
 - `KeyboardView.swift` — 27-key keyboard, visual note state, click to play
-- `OperatorMatrixView.swift` — 6×6 grid showing selected algorithm routing
-- `AlgorithmSelector.swift` — picker for 1–32 algorithms
+- `AlgorithmMatrixView.swift` — 6×6 grid showing selected algorithm routing
 - `OperatorPanel.swift` — knobs/sliders for the 6 operators (level, ratio, detune, ADSR)
-- `GlobalPanel.swift` — volume, transpose, LFO, feedback, sync
+- `GlobalPanel.swift` — volume, transpose, LFO rate/wave/depths, feedback, sync
 - Reusable `Knob.swift` / `LabeledSlider.swift` controls
-- Window is resizable (drop the fixed 1000×150 frame)
+- Window is resizable
 
-## Detailed tasks
+## Detailed tasks (ALL COMPLETE)
 
-### 4.1 App shell
-- `SynthesizerApp.swift`: `WindowGroup { ContentView() }` with default size (e.g., 1000×700), resizable
-- Remove Gong MIDI connect calls (CoreMIDI comes in Step 7)
+### 4.1 App shell (DONE)
+- `SynthesizerApp.swift`: `WindowGroup { ContentView() }` with default size (1000×700), resizable
 
-### 4.2 Keyboard
-- 27 white keys + black keys (MIDI 36–62 approximately, or full 21–108 range)
+### 4.2 Keyboard (DONE)
+- 27 white keys + black keys (MIDI 36–62)
 - Clicking a key triggers `SynthEngine.noteOn` / `noteOff`
 - Visual highlight on active notes
-- Use existing offset dictionaries from `Keyboard.swift` as reference
+- Mac keyboard keys also highlight corresponding piano keys
 
-### 4.3 Operator matrix (6×6)
+### 4.3 Operator matrix (6×6) (DONE)
 - Rows = operators 1–6, columns = operators 1–6
 - Dot/line at (modulator, carrier) shows modulation connection
 - Highlight carriers vs. modulators per selected algorithm
-- Read-only visualization (editing algorithms in UI is post-v1)
 
-### 4.4 Per-operator controls
+### 4.4 Per-operator controls (DONE)
 - For each operator: On/Off toggle, Ratio, Detune, Level, Attack, Decay, Sustain, Release
-- Knobs/sliders bound to `SynthEngine` published parameters
-- Operator 6 usually has feedback control
 
-### 4.5 Global controls
-- Volume, Transpose, Algorithm picker (1–32), LFO rate/depth/wave, Feedback, Oscillator Sync
+### 4.5 Global controls (DONE)
+- Volume, Transpose, Algorithm picker (1–32), LFO rate/wave/pitch depth/amp depth, Feedback, Oscillator Sync
 
-### 4.6 State binding
+### 4.6 State binding (DONE)
 - All UI controls read/write `SynthEngine` `@Published` properties
-- `SynthEngine` instantiated as `@StateObject` or `@ObservedObject` in `ContentView`
+- `SynthEngine` instantiated as `@StateObject` in `ContentView`
 
-## Files to create
-- `Synthesizer/ContentView.swift` (rewrite)
-- `Synthesizer/KeyboardView.swift`
-- `Synthesizer/OperatorMatrixView.swift`
-- `Synthesizer/OperatorPanel.swift`
-- `Synthesizer/GlobalPanel.swift`
-- `Synthesizer/Knob.swift`
-- `Synthesizer/LabeledSlider.swift`
+## Files created
+- `Synthesizer/ContentView.swift`
+- `Synthesizer/Views/KeyboardView.swift`
+- `Synthesizer/Views/AlgorithmMatrixView.swift`
+- `Synthesizer/Views/OperatorPanel.swift`
+- `Synthesizer/Views/GlobalPanel.swift`
+- `Synthesizer/Views/Knob.swift`
+- `Synthesizer/Views/LabeledSlider.swift`
+- `Synthesizer/Views/BaseModuleView.swift`
 
-## Files to modify
-- `Synthesizer/SynthesizerApp.swift` — resizable window, remove Gong
-- `Synthesizer/SynthEngine.swift` — ensure all params are `@Published`
-- `MASTER-PLAN.md` — mark Step 4 complete
-
-## Definition of done
-- [ ] Window opens resizable, shows keyboard + operator panels
-- [ ] Clicking keys produces sound via engine
-- [ ] Changing algorithm updates matrix visualization
-- [ ] Turning knobs changes sound in real time
-- [ ] Step 4 marked complete in `MASTER-PLAN.md`
-
-## Stop here
-Presets (Step 5) come next. FX (Step 3) and MIDI (Step 7) are deferred but can be added after presets.
+## Definition of done (ALL COMPLETE)
+- [x] Window opens resizable, shows keyboard + operator panels
+- [x] Clicking keys produces sound via engine
+- [x] Changing algorithm updates matrix visualization
+- [x] Turning knobs changes sound in real time
+- [x] Step 4 marked complete in `MASTER-PLAN.md`

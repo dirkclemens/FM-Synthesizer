@@ -28,7 +28,7 @@ Before coding, I need your input on:
 3. How faithful should the UI be to the hardware (replicate TFT display + physical knobs) vs. a modern macOS-native UI?
 4. Scope of MVP: synth engine + presets first, or include sequencer/arpeggiator/FX in v1?
 5. DX-7 SysEx compatibility: import only, or import + export?
-6. Keep using the Gong MIDI package, or switch to Apple's CoreMIDI directly?
+6. **MIDI library:** Apple CoreMIDI framework directly (no external dependency).
 7. Audio engine: keep `AVAudioEngine` + `AVAudioSourceNode` per voice, or render all voices in a single rendering block for efficiency?
 
 ## 3. Architecture Overview
@@ -54,7 +54,7 @@ Before coding, I need your input on:
 - All audio parameters published via `@Published` / `Combine` so UI and engine stay in sync
 
 ### MIDI layer
-- Gong (or CoreMIDI) for MIDI input: Note On/Off, CC, pitch bend, program change
+- CoreMIDI for MIDI input: Note On/Off, CC, pitch bend, program change
 - MIDI Learn: map any CC to any synth parameter
 - MIDI output: send Sysex/CC for preset changes (optional)
 
@@ -67,7 +67,6 @@ Before coding, I need your input on:
 
 ### Phase 0 — Project audit & foundation (no audio changes yet)
 - Verify the existing project builds in the installed Xcode
-- Audit Gong package compatibility with current Swift toolchain
 - Decide answers to Section 7 questions
 - Set up Git (repo is not currently a git repo) + branching strategy
 
@@ -140,7 +139,7 @@ Before coding, I need your input on:
 | `Preset.swift` | Codable preset + bank + JSON/SysEx persistence |
 | `Effects.swift` | AVAudioUnit-based FX chain |
 | `Arpeggiator.swift` / `Sequencer.swift` | MIDI event generation |
-| `MIDIManager.swift` | Gong/CoreMIDI wrapper, MIDI Learn |
+| `MIDIManager.swift` | CoreMIDI wrapper, MIDI Learn |
 | `ContentView.swift` | Main window layout |
 | `KeyboardView.swift` | 27-key keyboard |
 | `OperatorMatrixView.swift` | 6×6 algorithm visualization |
@@ -153,7 +152,7 @@ Before coding, I need your input on:
 |------|------------|
 | `AVAudioSourceNode` per voice × 6 ops is CPU-heavy | Start simple; if CPU too high, render all voices in one node |
 | Envelope/note-off clicks | Always release through envelope; zero-crossing where practical |
-| Gong package unmaintained | Fall back to Apple CoreMIDI directly |
+| CoreMIDI used directly | No external MIDI package dependency |
 | Thread safety (UI tweaks audio params on main thread) | Use `DispatchQueue` audio thread locks or `os_unfair_lock` for param updates |
 | Preset save blocked by sandbox | Adjust entitlements (`files.user-selected.read-write` or Application Support) |
 | DX-7 SysEx format complexity | Start with import only; use a known SysEx parser; test with DX-7 bank files |
@@ -164,7 +163,7 @@ Before coding, I need your input on:
 2. **UI style:** Should the synth reproduce a hardware look (display, rotary knobs, keys) as closely as possible, or would you prefer a clean, modern macOS-native synthesizer UI?
 3. **MVP scope:** Should Phase 1–4 (engine + UI + presets) be the first deliverable, with FX/arpeggiator/sequencer as follow-ups? Or include everything in v1?
 4. **Plug-in format:** Standalone macOS app only, or do you eventually want an AUv3/VST version too?
-5. **MIDI library:** Keep using Gong, or switch to Apple's CoreMIDI framework directly?
+5. **MIDI library:** Apple CoreMIDI framework directly (no external dependency).
 6. **DX-7 SysEx:** Import-only factory/user presets, or also export .syx files?
 7. **Preset storage:** Where should user presets live — Application Support, Documents, or a user-chosen folder (sandbox implications)?
 
