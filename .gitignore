@@ -3,4 +3,5 @@
 *.app
 *.png
 !screenshot1.png
+!Synthesizer/Assets.xcassets/**/*.png
 

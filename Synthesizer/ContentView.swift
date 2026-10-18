@@ -23,7 +23,11 @@ struct ContentView: View {
             
             Divider().padding(6)
             
-            GlobalPanel(engine: engine)
+            // MARK: GlobalPanel + Preset Browser
+            HStack(alignment: .top, spacing: 12) {
+                GlobalPanel(engine: engine)
+                PresetBrowserView(bank: bank, engine: engine)
+            }
             
             Divider().padding(6)
             
@@ -43,12 +47,7 @@ struct ContentView: View {
             }
             
             Divider().padding(6)
-            
-            // MARK: Preset Browser
-            PresetBrowserView(bank: bank, engine: engine)
-            
-            Divider().padding(6)
-            
+                        
             // MARK: Algorithm matrix + operator panels
             HStack(alignment: .top, spacing: 12) {
                 // Algorithm + operator matrix visualization

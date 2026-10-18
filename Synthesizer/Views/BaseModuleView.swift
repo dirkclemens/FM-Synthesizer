@@ -24,7 +24,7 @@ struct BaseModuleView<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
-            HStack {
+            HStack() {
                 ZStack {
                     Circle()
                         .fill(color.opacity(0.2))
@@ -57,6 +57,7 @@ struct BaseModuleView<Content: View>: View {
                 content
             }
             .padding(10)
+            .frame(minHeight: 220)
         }
         .background(
             RoundedRectangle(cornerRadius: 10)
