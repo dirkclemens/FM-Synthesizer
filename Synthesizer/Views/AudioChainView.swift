@@ -184,7 +184,7 @@ struct AudioChainView: View {
  private var arrowNodeView: some View {
  Image(systemName: "chevron.right")
  .font(.system(size: 10))
- .foregroundColor(.gray.opacity(0.5))
+ .foregroundColor(.yellow.opacity(0.5))
  }
 
  // MARK: - Effects

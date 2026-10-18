@@ -2,4 +2,5 @@
 
 *.app
 *.png
+!screenshot1.png
 

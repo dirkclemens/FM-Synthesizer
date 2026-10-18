@@ -95,24 +95,28 @@ struct OscilloscopeWaveformShape: View {
  let count: Int
 
  var body: some View {
+ GeometryReader { geometry in
  Path { path in
  guard samples.count > 1 else { return }
 
- let step = CGFloat(count > 1 ? CGFloat(count - 1) : 1)
- let sampleRate = CGFloat(count) / max(1, samples.count - 1)
+ let width = geometry.size.width
+ let height = geometry.size.height
 
- // Find min/max for normalization
+ // Find min/max for normalization so the waveform is always visible.
  let maxVal = samples.map { abs($0) }.max() ?? 0.001
  let normalizedMax = max(maxVal, 0.001)
 
- path.move(to: CGPoint(x: 0, y: rect.height / 2))
+ path.move(to: CGPoint(x: 0, y: height / 2))
 
  for i in 0..<min(count, samples.count) {
- let x = CGFloat(i) / CGFloat(count - 1) * rect.width
- let sample = CGFloat(clamp(samples[i], -1, 1))
- let y = rect.height / 2 - sample * rect.height * 0.4
+ let x = CGFloat(i) / CGFloat(count - 1) * width
+ let sample = CGFloat(clamp(samples[i] / normalizedMax, -1, 1))
+ let y = height / 2 - sample * height * 0.4
  path.addLine(to: CGPoint(x: x, y: y))
  }
+ }
+ .stroke(Color.cyan, lineWidth: 2)
+ .opacity(0.9)
  }
  }
 
@@ -135,8 +139,6 @@ struct OscilloscopeDisplayView: View {
  samples: samples,
  count: count
  )
- .stroke(Color.cyan, lineWidth: 2)
- .opacity(0.9)
 
  Path { path in
  let midY = geometry.size.height / 2

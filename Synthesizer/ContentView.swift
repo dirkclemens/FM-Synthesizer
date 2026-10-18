@@ -22,7 +22,11 @@ struct ContentView: View {
  MIDIConnectionView(midiManager: midiManager, engine: engine)
 
  Divider().padding(6)
+ 
+ GlobalPanel(engine: engine)
 
+ Divider().padding(6)
+ 
  // MARK: Oscilloscope + Audio Chain
  HStack(alignment: .top, spacing: 12) {
  OscilloscopeView(engine: engine)

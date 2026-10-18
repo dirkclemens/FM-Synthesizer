@@ -29,22 +29,22 @@ final class SynthEngine: ObservableObject {
  @Published var isRunning: Bool = false
  let sampleRate: Double
 
- @Published var volume: Float = 0.5
+ @Published var volume: Float = 0.8
  @Published var transpose: Float = 0
  @Published var algorithmIndex: Int = 0
- @Published var feedbackLevel: Float = 0.5
+ @Published var feedbackLevel: Float = 0.7
  @Published var oscillatorSync: Bool = false
  @Published var lfoRate: Float = 5.0
  @Published var lfoWave: LFOWave = .sine
  @Published var pitchBendRange: Float = 2.0
  @Published var pitchBendValue: Float = 0.0
  @Published var operatorParams: [(Float, Float, Float, Float, Float, Float, Float)] = [
- (0.15, 0, 1.0, 0.1, 0.1, 0.5, 0.5),
- (0.15, 0, 0.8, 0.1, 0.1, 0.5, 0.5),
- (0.15, 0, 0.6, 0.1, 0.1, 0.5, 0.5),
- (0.15, 0, 0.4, 0.1, 0.1, 0.5, 0.5),
- (0.15, 0, 0.3, 0.1, 0.1, 0.5, 0.5),
- (0.15, 0, 0.2, 0.1, 0.1, 0.5, 0.5),
+ (1.0, 0, 0.0, 0.1, 0.2, 0.0, 0.3),
+ (1.0, 0, 0.0, 0.1, 0.2, 0.0, 0.3),
+ (1.0, 0, 0.0, 0.1, 0.2, 0.0, 0.3),
+ (1.0, 0, 0.0, 0.1, 0.2, 0.0, 0.3),
+ (1.0, 0, 0.5, 0.1, 0.2, 0.0, 0.3),
+ (1.0, 0, 1.0, 0.1, 0.2, 1.0, 0.3),
  ]
  @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6)
 
@@ -105,6 +105,9 @@ final class SynthEngine: ObservableObject {
  voices.count { $0.state == .active || $0.state == .releasing }
  }
 
+ /// Diagnostic counter for render callback invocations.
+ private var renderDiagnosticCount = 0
+
  init() {
  self.mainMixer = audioEngine.mainMixerNode
  self.outputNode = audioEngine.outputNode
@@ -141,11 +144,6 @@ final class SynthEngine: ObservableObject {
 
  effects.rebuildChain()
  print("[SynthEngine] effects.rebuildChain() called")
-
- for node in voiceNodes {
- audioEngine.connect(node, to: mainMixer, format: nil)
- }
- print("[SynthEngine] All voice nodes reconnected to mainMixer")
 
  mainMixer.outputVolume = volume
  print("[SynthEngine] Volume set to \(volume)")
@@ -202,7 +200,8 @@ final class SynthEngine: ObservableObject {
  pitchBendRange: self.pitchBendRange,
  pitchBendValue: self.pitchBendValue,
  operatorParams: self.operatorParams,
- operatorIsOn: self.operatorIsOn
+ operatorIsOn: self.operatorIsOn,
+ activeVoiceCount: voices.count { $0.state == .active || $0.state == .releasing }
  )
  }
 
@@ -216,17 +215,27 @@ final class SynthEngine: ObservableObject {
 
  voice.oscillatorSync = params.oscillatorSync
  voice.setLFO(rate: params.lfoRate, wave: params.lfoWave)
+ voice.feedbackLevel = params.feedbackLevel
 
  let samples = voice.render(frameCount: frameCount)
- let voiceCount = max(1, activeVoiceCount)
- for frame in 0..<frameCount {
- var sample = samples[frame] / Float(voiceCount)
- for channel in 0..<numChannels {
- guard let channelData = ablPointer[channel].mData?.assumingMemoryBound(to: Float.self) else {
- continue
+ let voiceCount = max(1, params.activeVoiceCount)
+ renderDiagnosticCount += 1
+ if renderDiagnosticCount <= 3 {
+ let maxSample = samples.map { abs($0) }.max() ?? 0
+ print("[SynthEngine] renderVoiceNode(\(i)) call #\(renderDiagnosticCount): frameCount=\(frameCount), maxSample=\(maxSample), activeVoiceCount=\(params.activeVoiceCount)")
  }
- let buf = UnsafeMutableBufferPointer(start: channelData, count: frameCount)
- buf[frame] = sample
+ for buffer in ablPointer {
+ guard let data = buffer.mData?.assumingMemoryBound(to: Float.self) else { continue }
+ let numChannels = Int(buffer.mNumberChannels)
+ let numFrames = Int(buffer.mDataByteSize) / MemoryLayout<Float>.stride / numChannels
+ for frame in 0..<min(numFrames, frameCount) {
+ // Voice-count compensation keeps the summed output from clipping
+ // when several voices play at once; tanh() is a soft-clip limiter
+ // that rounds only the loudest peaks (gentle overdrive character).
+ let sample = tanh(samples[frame] / Float(voiceCount))
+ for ch in 0..<numChannels {
+ data[frame * numChannels + ch] = sample
+ }
  }
  }
  return noErr

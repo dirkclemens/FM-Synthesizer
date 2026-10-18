@@ -47,6 +47,10 @@ final class Voice {
  /// The algorithm used by this voice.
  private(set) var algorithm: FMAlgorithm
  
+ /// Feedback amount (0…1), driven by the engine's Feedback knob.
+ /// Replaces the algorithm's hardcoded feedbackLevel so the UI knob works.
+ var feedbackLevel: Float = 0.5
+ 
  /// Feedback sample buffer: previous output of the feedback operator.
  /// Used for one-sample-delayed self-modulation.
  private var feedbackSample: Float = 0
@@ -66,9 +70,10 @@ final class Voice {
  // MARK: - Configuration
  
  /// Sets the algorithm used by this voice.
+ /// Does not reset feedbackSample — that happens only on noteOn/silence
+ /// so one-sample-delayed feedback survives across render frames.
  func setAlgorithm(_ newAlgorithm: FMAlgorithm) {
  self.algorithm = newAlgorithm
- feedbackSample = 0
  }
  
  /// Configures all operators from a parameter set.
@@ -176,7 +181,7 @@ final class Voice {
  
  // Apply feedback from the previous frame (one-sample delay).
  if let fbOp = algorithm.feedbackOperator {
- modInputs[fbOp] += feedbackSample * algorithm.feedbackLevel
+ modInputs[fbOp] += feedbackSample * feedbackLevel
  }
  
  var carrierSum: Float = 0
