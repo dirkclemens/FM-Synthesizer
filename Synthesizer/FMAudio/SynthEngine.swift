@@ -55,24 +55,22 @@ final class SynthEngine: ObservableObject {
     let effects: EffectsChain
 
     @Published var effectFilterEnabled: Bool = false {
-        didSet { effects.setEnabled(.filter, enabled: effectFilterEnabled) }
+        didSet { try? withEngineStopped { effects.setEnabled(.filter, enabled: effectFilterEnabled) } }
     }
     @Published var effectDistortionEnabled: Bool = false {
-        didSet {
-            effects.setEnabled(.distortion, enabled: effectDistortionEnabled)
-        }
+        didSet { try? withEngineStopped { effects.setEnabled(.distortion, enabled: effectDistortionEnabled) } }
     }
     @Published var effectChorusEnabled: Bool = false {
-        didSet { effects.setEnabled(.chorus, enabled: effectChorusEnabled) }
+        didSet { try? withEngineStopped { effects.setEnabled(.chorus, enabled: effectChorusEnabled) } }
     }
     @Published var effectDelayEnabled: Bool = false {
-        didSet { effects.setEnabled(.delay, enabled: effectDelayEnabled) }
+        didSet { try? withEngineStopped { effects.setEnabled(.delay, enabled: effectDelayEnabled) } }
     }
     @Published var effectReverbEnabled: Bool = false {
-        didSet { effects.setEnabled(.reverb, enabled: effectReverbEnabled) }
+        didSet { try? withEngineStopped { effects.setEnabled(.reverb, enabled: effectReverbEnabled) } }
     }
     @Published var effectPhaserEnabled: Bool = false {
-        didSet { effects.setEnabled(.phaser, enabled: effectPhaserEnabled) }
+        didSet { try? withEngineStopped { effects.setEnabled(.phaser, enabled: effectPhaserEnabled) } }
     }
     @Published var effectFilterAmount: Float = 0.5 {
         didSet { effects.setAmount(.filter, amount: effectFilterAmount) }
@@ -190,6 +188,23 @@ final class SynthEngine: ObservableObject {
         audioEngine.stop()
         isRunning = false
         print("[SynthEngine] Audio engine stopped")
+    }
+
+    /// Executes `block` with the audio engine stopped, then restarts it and reinstalls the scope tap.
+    /// Required because AVAudioEngine requires the engine to be stopped when disconnecting/reconnecting
+    /// nodes, and stopping removes all audio taps (including the oscilloscope tap).
+    private func withEngineStopped<T>(_ block: () throws -> T) rethrows -> T {
+        let wasRunning = isRunning
+        if wasRunning { audioEngine.stop() }
+        defer {
+            if wasRunning {
+                do { try audioEngine.start() } catch {
+                    print("Failed to restart audio engine: \(error)")
+                }
+                setupScopeTap()
+            }
+        }
+        return try block()
     }
 
     private func setupScopeTap() {

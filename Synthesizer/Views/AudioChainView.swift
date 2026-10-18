@@ -19,7 +19,7 @@ struct AudioChainView: View {
             color: .blue
         ) {
             VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top, spacing: 6) {
+                HStack(alignment: .center, spacing: 6) {
                     voiceNodesSection
                     arrowNodeView
                     mixerNodeView
@@ -38,17 +38,17 @@ struct AudioChainView: View {
     
     private var voiceNodesSection: some View {
         VStack(spacing: 6) {
-            Text("Operators")
-                .font(.caption2)
-                .foregroundColor(.secondary)
-                .frame(maxWidth: .infinity, alignment: .center)
-            
             HStack(spacing: 4) {
                 ForEach(0..<6, id: \.self) { index in
                     voiceNodeView(voice: engine.voices[index], index: index)
                 }
             }
             .frame(width: 240)
+
+            Text("Operators")
+                .font(.caption2)
+                .foregroundColor(.secondary)
+                .frame(maxWidth: .infinity, alignment: .center)
         }
     }
     
@@ -102,19 +102,29 @@ struct AudioChainView: View {
     
     private var effectsChainView: some View {
         VStack(spacing: 6) {
+            HStack(){
+                VStack(spacing: 4) {
+                    effectToggleView(effect: .filter, isOn: $engine.effectFilterEnabled)
+                        .help("Filter enabled")
+                    effectToggleView(effect: .distortion, isOn: $engine.effectDistortionEnabled)
+                        .help("Distorsion")
+                    effectToggleView(effect: .chorus, isOn: $engine.effectChorusEnabled)
+                        .help("Chorus")
+                }
+                VStack(spacing: 4) {
+                    effectToggleView(effect: .delay, isOn: $engine.effectDelayEnabled)
+                        .help("Delay")
+                    effectToggleView(effect: .reverb, isOn: $engine.effectReverbEnabled)
+                        .help("Reverb")
+                    effectToggleView(effect: .phaser, isOn: $engine.effectPhaserEnabled)
+                        .help("Phaser")
+                }
+            }
             Text("FX Chain")
                 .font(.caption2)
                 .foregroundColor(.secondary)
                 .frame(maxWidth: .infinity, alignment: .center)
-            
-            VStack(spacing: 4) {
-                effectToggleView(effect: .filter, isOn: $engine.effectFilterEnabled)
-                effectToggleView(effect: .distortion, isOn: $engine.effectDistortionEnabled)
-                effectToggleView(effect: .chorus, isOn: $engine.effectChorusEnabled)
-                effectToggleView(effect: .delay, isOn: $engine.effectDelayEnabled)
-                effectToggleView(effect: .reverb, isOn: $engine.effectReverbEnabled)
-                effectToggleView(effect: .phaser, isOn: $engine.effectPhaserEnabled)
-            }
+
         }
         .frame(width: 100)
     }
@@ -150,8 +160,9 @@ struct AudioChainView: View {
     
     private var arrowNodeView: some View {
         Image(systemName: "chevron.right")
-            .font(.system(size: 10))
-            .foregroundColor(.yellow.opacity(0.5))
+            .font(.system(size: 10).bold())
+            .foregroundColor(.red.opacity(0.5))
+            .frame(width: 20, alignment: .center)
     }
     
     // MARK: - Effects

@@ -193,18 +193,11 @@ final class EffectsChain {
     // MARK: - Parameter updates
  
     /// Enables or disables an effect and rebuilds the chain.
-    /// Stops the audio engine before rebuilding the graph (AVAudioEngine requires
-    /// the engine to be stopped when disconnecting/reconnecting nodes).
+    /// Caller is responsible for stopping/starting the audio engine around this call,
+    /// since AVAudioEngine requires the engine to be stopped when disconnecting/reconnecting nodes.
     func setEnabled(_ type: EffectType, enabled: Bool) {
         configs[type]?.enabled = enabled
-        let wasRunning = audioEngine.isRunning
-        if wasRunning { audioEngine.stop() }
         rebuildChain()
-        if wasRunning {
-            do { try audioEngine.start() } catch {
-                print("Failed to restart audio engine after effect toggle: \(error)")
-            }
-        }
     }
  
     /// Sets the amount (wet/dry mix) for an effect.
