@@ -24,7 +24,6 @@ final class SynthEngine: ObservableObject {
  private let audioEngine = AVAudioEngine()
  private let mainMixer: AVAudioMixerNode
  private let outputNode: AVAudioOutputNode
-
  private var voiceNodes: [AVAudioSourceNode] = []
  var voices: [Voice] = []
  @Published var isRunning: Bool = false
@@ -100,14 +99,13 @@ final class SynthEngine: ObservableObject {
  private let paramLock = ParameterLock()
 
  @Published var scopeSamples: [Float] = Array(repeating: 0, count: 512)
- private var scopeTap: AVAudioSourceNode?
 
  init() {
- mainMixer = audioEngine.mainMixerNode
- outputNode = audioEngine.outputNode
- sampleRate = outputNode.inputFormat(forBus: 0).sampleRate
+ self.mainMixer = audioEngine.mainMixerNode
+ self.outputNode = audioEngine.outputNode
+ self.sampleRate = outputNode.inputFormat(forBus: 0).sampleRate
 
- print("[SYNTH] Sample rate: \(sampleRate)")
+ print("[SynthEngine] Sample rate: \(sampleRate)")
  print("[SYNTH] Main mixer: \(mainMixer)")
  print("[SynthEngine] Output node: \(outputNode)")
 
@@ -172,27 +170,16 @@ final class SynthEngine: ObservableObject {
  }
 
  private func setupScopeTap() {
- let tapNode = AVAudioSourceNode { [weak self] _, _, frameCount, audioBufferList -> OSStatus in
- self?.captureScopeSamples(frameCount: Int(frameCount), audioBufferList: audioBufferList) ?? noErr
- }
- scopeTap = tapNode
- audioEngine.attach(tapNode)
- audioEngine.connect(tapNode, to: outputNode, format: nil)
- }
-
- private func captureScopeSamples(frameCount: Int, audioBufferList: UnsafeMutablePointer<AudioBufferList>) -> OSStatus {
- let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
- guard let firstBuffer = ablPointer.first,
- let data = firstBuffer.mData?.assumingMemoryBound(to: Float.self) else {
- return noErr
- }
- let count = min(frameCount, 512)
+ mainMixer.installTap(onBus: 0, bufferSize: 1024, format: outputNode.inputFormat(forBus: 0)) { (buffer, time) in
+ let ablPointer = UnsafeMutableAudioBufferListPointer(UnsafeMutablePointer(mutating: buffer.audioBufferList))
+ guard let data = ablPointer[0].mData?.assumingMemoryBound(to: Float.self) else { return }
+ let count = min(Int(ablPointer[0].mDataByteSize) / MemoryLayout<Float>.stride, 512)
  var samples = [Float](repeating: 0, count: count)
  for i in 0..<count { samples[i] = data[i] }
  DispatchQueue.main.async {
  self.scopeSamples = samples
  }
- return noErr
+ }
  }
 
  private func renderVoiceNode(i: Int, frameCount: Int, audioBufferList: UnsafeMutablePointer<AudioBufferList>) -> OSStatus {
@@ -337,7 +324,6 @@ final class SynthEngine: ObservableObject {
  }
  p.arpeggiatorMode = arpeggiator.mode.rawValue
  p.arpeggiatorRate = arpeggiator.rate
- p.arpeggiatorGate = arpeggiator.gate
  p.arpeggiatorOctaveRange = arpeggiator.octaveRange
  p.sequencerTempo = sequencer.tempo
  p.sequencerSteps = sequencer.steps

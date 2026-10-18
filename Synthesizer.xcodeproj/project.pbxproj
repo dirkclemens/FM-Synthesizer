@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4332DD8A3083CEC400D70188 /* Oscillator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4332DD893083CEC400D70188 /* Oscillator.swift */; };
+		4332DD8E308433D400D70188 /* AudioChainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4332DD8D308433D400D70188 /* AudioChainView.swift */; };
 		FD66863A2968D8A700FD8C4A /* SynthesizerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD6686392968D8A700FD8C4A /* SynthesizerApp.swift */; };
 		FD66863C2968D8A700FD8C4A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD66863B2968D8A700FD8C4A /* ContentView.swift */; };
 		FD66863E2968D8A700FD8C4A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FD66863D2968D8A700FD8C4A /* Assets.xcassets */; };
@@ -40,6 +41,7 @@
 
 /* Begin PBXFileReference section */
 		4332DD893083CEC400D70188 /* Oscillator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oscillator.swift; sourceTree = "<group>"; };
+		4332DD8D308433D400D70188 /* AudioChainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioChainView.swift; sourceTree = "<group>"; };
 		FD6686362968D8A700FD8C4A /* Synthesizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Synthesizer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FD6686392968D8A700FD8C4A /* SynthesizerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SynthesizerApp.swift; sourceTree = "<group>"; };
 		FD66863B2968D8A700FD8C4A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -87,6 +89,7 @@
 				FD6686B22968E70000FD8C4A /* AlgorithmMatrixView.swift */,
 				FD6686842968E70000FD8C4A /* AlgorithmSelector.swift */,
 				FD6686962968E70000FD8C4A /* ArpeggiatorView.swift */,
+				4332DD8D308433D400D70188 /* AudioChainView.swift */,
 				FD6686B52968E70000FD8C4A /* BaseModuleView.swift */,
 				FD6686882968E70000FD8C4A /* GlobalPanel.swift */,
 				FD6686802968E70000FD8C4A /* KeyboardView.swift */,
@@ -224,6 +227,7 @@
 				FD6686772968E70000FD8C4A /* SynthEngine.swift in Sources */,
 				FD66867B2968E70000FD8C4A /* LFO.swift in Sources */,
 				FD66867D2968E70000FD8C4A /* Knob.swift in Sources */,
+				4332DD8E308433D400D70188 /* AudioChainView.swift in Sources */,
 				FD66867F2968E70000FD8C4A /* LabeledSlider.swift in Sources */,
 				FD6686812968E70000FD8C4A /* KeyboardView.swift in Sources */,
 				FD6686852968E70000FD8C4A /* AlgorithmSelector.swift in Sources */,
