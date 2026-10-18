@@ -55,11 +55,14 @@ struct BaseModuleView<Content: View>: View {
             )
             
             // Content
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 0) {
                 content
             }
+            .frame(alignment: .top)
             .frame(minHeight: minHeight)
             .padding(12)
+            
+            Spacer()
         }
         .background(
             RoundedRectangle(cornerRadius: 10)

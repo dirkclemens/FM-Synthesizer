@@ -17,7 +17,7 @@ struct GlobalPanel: View {
             color: .blue
         ) {
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 16) {
+                HStack(alignment: .top, spacing: 16) {
                     // Volume
                     Knob(
                         title: "Volume",
@@ -93,14 +93,15 @@ struct GlobalPanel: View {
                     }
                     .pickerStyle(.segmented)
                     .frame(maxWidth: .infinity)
-
+                    
+                    Spacer()
+                    
                     // Oscillator sync
-                    HStack {
-                        Toggle("Oscillator Sync", isOn: $engine.oscillatorSync)
-                            .font(.caption)
-                        Spacer()
-                    }
-              
+                    Toggle("Oscillator Sync", isOn: $engine.oscillatorSync)
+                        .font(.caption)
+                }
+
+                HStack {
                     Spacer()
                     
                     // Reset button
@@ -110,7 +111,6 @@ struct GlobalPanel: View {
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
                     .help("Silence all voices and reset engine state")
-                    Spacer()
                 }
             }
         }
