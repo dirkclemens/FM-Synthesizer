@@ -12,12 +12,14 @@ struct BaseModuleView<Content: View>: View {
     let title: String
     let icon: String
     let color: Color
+    let minHeight: CGFloat
     let content: Content
     
-    init(title: String, icon: String, color: Color, @ViewBuilder content: () -> Content) {
+    init(title: String, icon: String, color: Color, minHeight: CGFloat? = nil, @ViewBuilder content: () -> Content) {
         self.title = title
         self.icon = icon
         self.color = color
+        self.minHeight = minHeight ?? 190.0
         self.content = content()
     }
     
@@ -56,8 +58,8 @@ struct BaseModuleView<Content: View>: View {
             VStack(alignment: .leading, spacing: 10) {
                 content
             }
-            .padding(10)
-            .frame(minHeight: 220)
+            .frame(minHeight: minHeight)
+            .padding(12)
         }
         .background(
             RoundedRectangle(cornerRadius: 10)
