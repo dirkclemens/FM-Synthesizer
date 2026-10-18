@@ -41,11 +41,11 @@ final class EffectsChain {
  
     /// Effect nodes (created lazily when first enabled).
     private var filterNode: AVAudioUnitEQ?
-    private var distortionNode: AVAudioSourceNode?
-    private var chorusNode: AVAudioSourceNode?
+    private var distortionNode: AVAudioMixerNode?
+    private var chorusNode: AVAudioMixerNode?
     private var delayNode: AVAudioUnitDelay?
     private var reverbNode: AVAudioUnitReverb?
-    private var phaserNode: AVAudioSourceNode?
+    private var phaserNode: AVAudioMixerNode?
  
     /// Whether each effect is currently enabled.
     var configs: [EffectType: EffectConfig] = [:]
@@ -106,30 +106,12 @@ final class EffectsChain {
             node = filter
  
         case .distortion:
-            let dn = AVAudioSourceNode {
-                [weak self] _,
-                _,
-                frameCount,
-                audioBufferList -> OSStatus in
-                self?.processDistortion(
-                    frameCount: Int(frameCount),
-                    audioBufferList: audioBufferList
-                ) ?? noErr
-            }
+            let dn = AVAudioMixerNode()
             distortionNode = dn
             node = dn
  
         case .chorus:
-            let cn = AVAudioSourceNode {
-                [weak self] _,
-                _,
-                frameCount,
-                audioBufferList -> OSStatus in
-                self?.processChorus(
-                    frameCount: Int(frameCount),
-                    audioBufferList: audioBufferList
-                ) ?? noErr
-            }
+            let cn = AVAudioMixerNode()
             chorusNode = cn
             node = cn
  
@@ -149,16 +131,7 @@ final class EffectsChain {
             node = rn
  
         case .phaser:
-            let pn = AVAudioSourceNode {
-                [weak self] _,
-                _,
-                frameCount,
-                audioBufferList -> OSStatus in
-                self?.processPhaser(
-                    frameCount: Int(frameCount),
-                    audioBufferList: audioBufferList
-                ) ?? noErr
-            }
+            let pn = AVAudioMixerNode()
             phaserNode = pn
             node = pn
         }
