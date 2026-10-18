@@ -39,12 +39,12 @@ final class SynthEngine: ObservableObject {
  @Published var pitchBendRange: Float = 2.0
  @Published var pitchBendValue: Float = 0.0
  @Published var operatorParams: [(Float, Float, Float, Float, Float, Float, Float)] = [
- (1.0, 0, 1.0, 0.1, 0.1, 0.5, 0.5),
- (2.0, 0, 0.8, 0.1, 0.1, 0.5, 0.5),
- (3.0, 0, 0.6, 0.1, 0.1, 0.5, 0.5),
- (4.0, 0, 0.4, 0.1, 0.1, 0.5, 0.5),
- (5.0, 0, 0.3, 0.1, 0.1, 0.5, 0.5),
- (6.0, 0, 0.2, 0.1, 0.1, 0.5, 0.5),
+ (0.15, 0, 1.0, 0.1, 0.1, 0.5, 0.5),
+ (0.15, 0, 0.8, 0.1, 0.1, 0.5, 0.5),
+ (0.15, 0, 0.6, 0.1, 0.1, 0.5, 0.5),
+ (0.15, 0, 0.4, 0.1, 0.1, 0.5, 0.5),
+ (0.15, 0, 0.3, 0.1, 0.1, 0.5, 0.5),
+ (0.15, 0, 0.2, 0.1, 0.1, 0.5, 0.5),
  ]
  @Published var operatorIsOn: [Bool] = Array(repeating: true, count: 6)
 
@@ -99,6 +99,11 @@ final class SynthEngine: ObservableObject {
  private let paramLock = ParameterLock()
 
  @Published var scopeSamples: [Float] = Array(repeating: 0, count: 512)
+
+ /// Number of currently active voices (for voice stealing compensation).
+ var activeVoiceCount: Int {
+ voices.count { $0.state == .active || $0.state == .releasing }
+ }
 
  init() {
  self.mainMixer = audioEngine.mainMixerNode
@@ -213,9 +218,9 @@ final class SynthEngine: ObservableObject {
  voice.setLFO(rate: params.lfoRate, wave: params.lfoWave)
 
  let samples = voice.render(frameCount: frameCount)
-
+ let voiceCount = max(1, activeVoiceCount)
  for frame in 0..<frameCount {
- let sample = samples[frame]
+ var sample = samples[frame] / Float(voiceCount)
  for channel in 0..<numChannels {
  guard let channelData = ablPointer[channel].mData?.assumingMemoryBound(to: Float.self) else {
  continue

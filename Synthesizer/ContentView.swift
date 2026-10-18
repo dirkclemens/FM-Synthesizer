@@ -24,8 +24,12 @@ struct ContentView: View {
  Divider().padding(6)
 
  // MARK: Oscilloscope + Audio Chain
+ HStack(alignment: .top, spacing: 12) {
  OscilloscopeView(engine: engine)
-
+ AudioChainView(engine: engine)
+ .frame(minWidth: 1000)
+ }
+ 
  Divider().padding(6)
 
  // MARK: Arpeggiator + Sequencer
