@@ -48,7 +48,7 @@ struct SequencerView: View {
                         )
                     }
                 }
-                .frame(maxHeight: 60)
+//                .frame(maxHeight: 60)
                 
                 // Tempo
                 LabeledSlider(

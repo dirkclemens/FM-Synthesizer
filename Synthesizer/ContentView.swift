@@ -21,7 +21,7 @@ struct ContentView: View {
             // MARK: MIDI Connection
             MIDIConnectionView(midiManager: midiManager, engine: engine)
             
-            Divider().padding(6)
+            Spacer().padding(2)
             
             // MARK: GlobalPanel + Preset Browser
             HStack(alignment: .top, spacing: 12) {
@@ -29,32 +29,32 @@ struct ContentView: View {
                 PresetBrowserView(bank: bank, engine: engine)
             }
             
-            Divider().padding(6)
-            
+            Spacer().padding(2)
+
             // MARK: Oscilloscope + Audio Chain
             HStack(alignment: .top, spacing: 12) {
                 OscilloscopeView(engine: engine)
                 AudioChainView(engine: engine)
-                    .frame(minWidth: 1000)
+//                    .frame(minWidth: 1000)
             }
             
-            Divider().padding(6)
-            
+            Spacer().padding(2)
+
             // MARK: Arpeggiator + Sequencer
             HStack(alignment: .top, spacing: 12) {
                 ArpeggiatorView(arpeggiator: engine.arpeggiator)
                 SequencerView(sequencer: engine.sequencer)
             }
             
-            Divider().padding(6)
-                        
+            Spacer().padding(2)
+
             // MARK: Algorithm matrix + operator panels
             HStack(alignment: .top, spacing: 12) {
                 // Algorithm + operator matrix visualization
                 AlgorithmMatrixView(algorithmIndex: $engine.algorithmIndex)
                     .frame(maxWidth: 260)
                 
-                Divider()
+//                Divider()
                 
                 // Six operator panels in a 2×3 grid
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
@@ -65,8 +65,8 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity)
             }
             
-            Divider().padding(6)
-            
+            Spacer().padding(2)
+
             // MARK: Keyboard
             HStack(alignment: .top, spacing: 0) {
                 Spacer()
@@ -91,10 +91,10 @@ struct ContentView: View {
                 )
                 Spacer()
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, 12)
         }
         .frame(minWidth: 900, maxWidth: .infinity, minHeight: 850, maxHeight: .infinity)
-        .padding(8)
+        .padding(12)
         .background(
             LinearGradient(
                 colors: [Color.black.opacity(0.8), Color(NSColor.controlBackgroundColor).opacity(0.3)],

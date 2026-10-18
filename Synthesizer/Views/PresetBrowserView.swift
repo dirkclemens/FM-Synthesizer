@@ -51,7 +51,7 @@ struct PresetBrowserView: View {
                     }
                     .padding(.horizontal, 4)
                 }
-                .frame(maxHeight: 160)
+                .frame(maxHeight: 120)
                 
                 Divider()
                 

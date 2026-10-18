@@ -54,6 +54,8 @@ struct GlobalPanel: View {
                         formatter: { String(format: "%.2f", $0) }
                     )
                     
+                    Spacer()
+                    
                     // LFO rate
                     Knob(
                         title: "LFO Rate",
@@ -98,10 +100,10 @@ struct GlobalPanel: View {
                             .font(.caption)
                         Spacer()
                     }
-                }
-
-                // Reset button
-                HStack {
+              
+                    Spacer()
+                    
+                    // Reset button
                     Button("Reset Engine") {
                         engine.reset()
                     }
