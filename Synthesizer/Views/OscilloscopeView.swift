@@ -17,7 +17,7 @@ struct OscilloscopeView: View {
         var body: some View {
                 BaseModuleView(
                         title: "Oscilloscope",
-                        icon: "SCOPE",
+                        icon: "S",
                         color: .cyan
                 ) {
                         VStack(alignment: .leading, spacing: 8) {
