@@ -50,12 +50,6 @@ final class EffectsChain {
     /// Whether each effect is currently enabled.
     var configs: [EffectType: EffectConfig] = [:]
  
-    /// The last connected node in the chain (before output).
-    private var lastNode: AVAudioNode?
- 
-    /// Track which nodes have been created.
-    private var createdNodes: Set<EffectType> = []
- 
     init(
         audioEngine: AVAudioEngine,
         inputNode: AVAudioNode,
@@ -64,86 +58,167 @@ final class EffectsChain {
         self.audioEngine = audioEngine
         self.inputNode = inputNode
         self.outputNode = outputNode
- 
+
         // Initialize all configs as disabled.
         for type in EffectType.allCases {
             configs[type] = EffectConfig()
         }
- 
-        // Connect input directly to output (no effects yet).
-        audioEngine.connect(inputNode, to: outputNode, format: nil)
+
+        // Create all effect nodes up front and connect them in a permanent chain.
+        // Effects are enabled/disabled via parameters (bypass), not by changing
+        // topology — reconnecting nodes at runtime would break the audio graph.
+        createAllNodes()
+        connectAllNodes()
+        setAllEffectsEnabled(false)
     }
- 
-    // MARK: - Node creation (lazy)
- 
+
+    // MARK: - Node creation
+
+    /// Creates all effect nodes up front.
+    private func createAllNodes() {
+        _ = createNode(for: .filter)
+        _ = createNode(for: .distortion)
+        _ = createNode(for: .chorus)
+        _ = createNode(for: .delay)
+        _ = createNode(for: .reverb)
+        _ = createNode(for: .phaser)
+    }
+
+    /// Creates and attaches a single effect node (lazy, called once per type).
     private func createNode(for type: EffectType) -> AVAudioNode? {
-        guard !createdNodes.contains(type) else {
-            return nodeFor(type)
-        }
- 
         let node: AVAudioNode?
- 
+
         switch type {
         case .filter:
             let filter = AVAudioUnitEQ(numberOfBands: 4)
             filter.bands[0].filterType = .lowPass
             filter.bands[0].frequency = 5000
             filter.bands[0].gain = 0
- 
+
             filter.bands[1].filterType = .parametric
             filter.bands[1].frequency = 1000
             filter.bands[1].gain = 0
- 
+
             filter.bands[2].filterType = .parametric
             filter.bands[2].frequency = 3000
             filter.bands[2].gain = 0
- 
+
             filter.bands[3].filterType = .highPass
             filter.bands[3].frequency = 100
             filter.bands[3].gain = 0
- 
+
             filterNode = filter
             node = filter
- 
+
         case .distortion:
             let dn = AVAudioMixerNode()
             distortionNode = dn
             node = dn
- 
+
         case .chorus:
             let cn = AVAudioMixerNode()
             chorusNode = cn
             node = cn
- 
+
         case .delay:
             let dn = AVAudioUnitDelay()
             dn.delayTime = 0.25
             dn.feedback = 30
-            dn.wetDryMix = 25
+            dn.wetDryMix = 0
             delayNode = dn
             node = dn
- 
+
         case .reverb:
             let rn = AVAudioUnitReverb()
             rn.loadFactoryPreset(.smallRoom)
-            rn.wetDryMix = 20
+            rn.wetDryMix = 0
             reverbNode = rn
             node = rn
- 
+
         case .phaser:
             let pn = AVAudioMixerNode()
             phaserNode = pn
             node = pn
         }
- 
+
         if let node = node {
             audioEngine.attach(node)
-            createdNodes.insert(type)
         }
- 
+
         return node
     }
- 
+
+    /// Connects all effect nodes in a permanent chain:
+    /// input → filter → distortion → chorus → delay → reverb → phaser → output
+    private func connectAllNodes() {
+        audioEngine.disconnectNodeOutput(inputNode)
+        audioEngine.disconnectNodeInput(outputNode)
+
+        audioEngine.connect(inputNode, to: filterNode!, format: nil)
+        audioEngine.connect(filterNode!, to: distortionNode!, format: nil)
+        audioEngine.connect(distortionNode!, to: chorusNode!, format: nil)
+        audioEngine.connect(chorusNode!, to: delayNode!, format: nil)
+        audioEngine.connect(delayNode!, to: reverbNode!, format: nil)
+        audioEngine.connect(reverbNode!, to: phaserNode!, format: nil)
+        audioEngine.connect(phaserNode!, to: outputNode, format: nil)
+    }
+
+    /// Enables or disables all effects by adjusting bypass parameters.
+    private func setAllEffectsEnabled(_ enabled: Bool) {
+        for type in EffectType.allCases {
+            updateEffectEnabled(type, enabled: enabled)
+        }
+    }
+
+    /// Adjusts an effect's parameters to enable or disable it without
+    /// changing the audio graph topology.
+    private func updateEffectEnabled(_ type: EffectType, enabled: Bool) {
+        switch type {
+        case .filter:
+            if let filter = filterNode {
+                if enabled {
+                    let gain = (configs[.filter]?.amount ?? 0.5 - 0.5) * 24
+                    for band in filter.bands {
+                        band.gain = gain
+                    }
+                } else {
+                    // Bypass: unity gain (0 dB) on all bands
+                    for band in filter.bands {
+                        band.gain = 0
+                    }
+                }
+            }
+        case .distortion:
+            // Mixer node passes audio through at unity gain — always "enabled"
+            break
+        case .chorus:
+            // Mixer node passes audio through at unity gain — always "enabled"
+            break
+        case .delay:
+            if let delay = delayNode {
+                delay.wetDryMix = enabled ? (configs[.delay]?.amount ?? 0.5) * 100 : 0
+            }
+        case .reverb:
+            if let reverb = reverbNode {
+                reverb.wetDryMix = enabled ? (configs[.reverb]?.amount ?? 0.5) * 100 : 0
+            }
+        case .phaser:
+            // Mixer node passes audio through at unity gain — always "enabled"
+            break
+        }
+    }
+
+    // MARK: - Chain management (deprecated — topology is fixed at init)
+
+    /// No longer disconnects/reconnects nodes at runtime.
+    /// Kept for backward compatibility; topology is fixed at init.
+    func rebuildChain() {
+        setAllEffectsEnabled(false)
+        for type in EffectType.allCases where configs[type]?.enabled == true {
+            updateEffectEnabled(type, enabled: true)
+        }
+    }
+
     private func nodeFor(_ type: EffectType) -> AVAudioNode? {
         switch type {
         case .filter: return filterNode
@@ -154,58 +229,24 @@ final class EffectsChain {
         case .phaser: return phaserNode
         }
     }
- 
-    // MARK: - Chain management
- 
-    /// Rebuilds the effect chain based on current enabled/disabled states.
-    func rebuildChain() {
-        // Disconnect the output of inputNode (mainMixer) and input of outputNode.
-        // The effects chain inserts between mainMixer and outputNode.
-        audioEngine.disconnectNodeOutput(inputNode)
-        audioEngine.disconnectNodeInput(outputNode)
 
-        // Disconnect all created effect nodes.
-        for type in createdNodes {
-            if let node = nodeFor(type) {
-                audioEngine.disconnectNodeInput(node)
-                audioEngine.disconnectNodeOutput(node)
-            }
-        }
-
-        // Build the chain: input → [enabled effects] → output
-        var previousNode: AVAudioNode = inputNode
-
-        for type in EffectType.allCases {
-            guard let config = configs[type], config.enabled else { continue }
-
-            let effectNode = createNode(for: type)
-            if let effectNode = effectNode {
-                audioEngine.connect(previousNode, to: effectNode, format: nil)
-                previousNode = effectNode
-            }
-        }
-
-        // Connect last effect to output.
-        audioEngine.connect(previousNode, to: outputNode, format: nil)
-        lastNode = previousNode
-    }
- 
     // MARK: - Parameter updates
- 
-    /// Enables or disables an effect and rebuilds the chain.
-    /// Caller is responsible for stopping/starting the audio engine around this call,
-    /// since AVAudioEngine requires the engine to be stopped when disconnecting/reconnecting nodes.
+
+    /// Enables or disables an effect by adjusting bypass parameters.
+    /// Does not change the audio graph topology.
     func setEnabled(_ type: EffectType, enabled: Bool) {
         configs[type]?.enabled = enabled
-        rebuildChain()
+        updateEffectEnabled(type, enabled: enabled)
     }
- 
+
     /// Sets the amount (wet/dry mix) for an effect.
     func setAmount(_ type: EffectType, amount: Float) {
         configs[type]?.amount = max(0, min(1, amount))
-        updateEffectAmount(type, amount: amount)
+        if configs[type]?.enabled == true {
+            updateEffectAmount(type, amount: amount)
+        }
     }
- 
+
     private func updateEffectAmount(_ type: EffectType, amount: Float) {
         switch type {
         case .filter:
@@ -215,22 +256,19 @@ final class EffectsChain {
                     band.gain = gain
                 }
             }
- 
         case .delay:
             if let delay = delayNode {
                 delay.wetDryMix = amount * 100
             }
- 
         case .reverb:
             if let reverb = reverbNode {
                 reverb.wetDryMix = amount * 100
             }
- 
         default:
             break
         }
     }
- 
+
     /// Filter cutoff frequency (Hz).
     func setFilterCutoff(_ cutoff: Float) {
         if let filter = filterNode {
@@ -238,21 +276,20 @@ final class EffectsChain {
             filter.bands[3].frequency = max(50, cutoff / 50)
         }
     }
- 
+
     /// Filter resonance (Q).
     func setFilterResonance(_ resonance: Float) {
         // EQ Q parameter not directly accessible; bandwidth is fixed per band type.
         _ = resonance
     }
- 
-    // MARK: - Custom effect processing state
- 
-    /// Chorus state.
+
+    // MARK: - Custom effect processing state (placeholder for future implementation)
+    /// The mixer nodes (distortion, chorus, phaser) are currently pass-through.
+    /// Custom DSP processing can be added here in the future using AVAudioUnit subclasses.
     private var chorusPhase: Float = 0
     private var chorusBuffer: [Float] = []
     private var chorusWriteIndex: Int = 0
- 
-    /// Phaser state.
+
     private var phaserFeedback: Float = 0.5
     private var phaserLFOPhase: Float = 0
     private var phaserAllPass1: Float = 0
