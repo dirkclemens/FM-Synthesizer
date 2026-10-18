@@ -29,7 +29,9 @@ final class SynthEngine: ObservableObject {
   @Published var isRunning: Bool = false
   let sampleRate: Double
 
-  @Published var volume: Float = 0.8
+  @Published var volume: Float = 0.8 {
+  didSet { mainMixer.outputVolume = volume }
+ }
   @Published var transpose: Float = 0
   @Published var algorithmIndex: Int = 0
   @Published var feedbackLevel: Float = 0.7
