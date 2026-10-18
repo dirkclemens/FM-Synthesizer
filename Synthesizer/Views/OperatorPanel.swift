@@ -66,6 +66,8 @@ struct OperatorPanel: View {
                     .frame(maxWidth: .infinity)
                 }
                 
+                Spacer()
+                
                 // ADSR
                 HStack(spacing: 12) {
                     Knob(

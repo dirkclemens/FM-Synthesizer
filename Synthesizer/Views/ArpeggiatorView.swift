@@ -19,35 +19,38 @@ struct ArpeggiatorView: View {
             VStack(alignment: .leading, spacing: 12) {
                 // On/Off toggle
                 HStack(spacing: 16) {
-                    VStack(spacing: 16) {
-                        Toggle("Arpeggiator", isOn: Binding(
-                            get: { arpeggiator.isRunning },
-                            set: { newValue in
-                                if newValue {
-                                    arpeggiator.start()
-                                } else {
-                                    arpeggiator.stop()
-                                }
+                    Toggle("Arpeggiator", isOn: Binding(
+                        get: { arpeggiator.isRunning },
+                        set: { newValue in
+                            if newValue {
+                                arpeggiator.start()
+                            } else {
+                                arpeggiator.stop()
                             }
-                        ))
-                        .font(.caption)
-                        
-                        //Arpeggiator
-                        Toggle("", isOn: .constant(false))
-                            .opacity(0)
-                        // Spacer()
-                    }
+                        }
+                    ))
+                    .font(.caption)
                     
+                    //Arpeggiator
+                    Toggle("", isOn: .constant(false))
+                        .opacity(0)
+                }
+                    
+                HStack(spacing: 16) {
                     // Mode picker
                     Picker("Mode", selection: $arpeggiator.mode) {
                         ForEach(ArpMode.allCases, id: \.self) { mode in
                             Text(modeLabel(mode)).tag(mode)
                         }
                     }
-                    .pickerStyle(.automatic)
+                    .pickerStyle(.segmented)
                     .frame(maxWidth: .infinity)
+                    
+                    Spacer()
                 }
                 
+                Spacer()
+
                 // Rate and gate
                 HStack(spacing: 16) {
                     Knob(

@@ -62,6 +62,8 @@ struct SequencerView: View {
                     unit: " BPM",
                     formatter: { String(format: "%.0f", $0) }
                 )
+                
+                Spacer()
             }
         }
     }

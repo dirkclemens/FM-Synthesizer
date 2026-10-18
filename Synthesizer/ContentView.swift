@@ -21,7 +21,7 @@ struct ContentView: View {
             // MARK: MIDI Connection
             MIDIConnectionView(midiManager: midiManager, engine: engine)
             
-            Spacer().padding(2)
+            Spacer().padding(0)
             
             // MARK: GlobalPanel + Preset Browser
             HStack(alignment: .top, spacing: 12) {
@@ -29,7 +29,7 @@ struct ContentView: View {
                 PresetBrowserView(bank: bank, engine: engine)
             }
             
-            Spacer().padding(2)
+            Spacer().padding(0)
 
             // MARK: Oscilloscope + Audio Chain
             HStack(alignment: .top, spacing: 12) {
@@ -38,7 +38,7 @@ struct ContentView: View {
 //                    .frame(minWidth: 1000)
             }
             
-            Spacer().padding(2)
+            Spacer().padding(0)
 
             // MARK: Arpeggiator + Sequencer
             HStack(alignment: .top, spacing: 12) {
@@ -46,15 +46,13 @@ struct ContentView: View {
                 SequencerView(sequencer: engine.sequencer)
             }
             
-            Spacer().padding(2)
+            Spacer().padding(0)
 
             // MARK: Algorithm matrix + operator panels
             HStack(alignment: .top, spacing: 12) {
                 // Algorithm + operator matrix visualization
                 AlgorithmMatrixView(algorithmIndex: $engine.algorithmIndex)
-                    .frame(maxWidth: 260)
-                
-//                Divider()
+                    .frame(maxWidth: 260)                
                 
                 // Six operator panels in a 2×3 grid
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
@@ -65,7 +63,7 @@ struct ContentView: View {
                 .frame(maxWidth: .infinity)
             }
             
-            Spacer().padding(2)
+            Spacer().padding(0)
 
             // MARK: Keyboard
             HStack(alignment: .top, spacing: 0) {

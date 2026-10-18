@@ -17,7 +17,7 @@ struct AlgorithmMatrixView: View {
             title: "Algorithm \(algorithmIndex + 1)",
             icon: "FM",
             color: .blue,
-            minHeight: 320
+            minHeight: 300
         ) {
             VStack(alignment: .leading, spacing: 12) {
                 // Algorithm picker
@@ -30,6 +30,8 @@ struct AlgorithmMatrixView: View {
                 }
                 .pickerStyle(.menu)
                 .frame(maxWidth: .infinity)
+                
+                Spacer()
                 
                 // Operator matrix
                 VStack(alignment: .leading, spacing: 6) {

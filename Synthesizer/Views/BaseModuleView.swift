@@ -19,15 +19,15 @@ struct BaseModuleView<Content: View>: View {
         self.title = title
         self.icon = icon
         self.color = color
-        self.minHeight = minHeight ?? 190.0
+        self.minHeight = minHeight ?? 150.0
         self.content = content()
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Header
-            HStack() {
-                ZStack {
+            HStack(spacing: 12) {
+                ZStack() {
                     Circle()
                         .fill(color.opacity(0.2))
                         .frame(width: 24, height: 24)
@@ -43,15 +43,16 @@ struct BaseModuleView<Content: View>: View {
                     .foregroundColor(.primary)
                 Spacer()
             }
-            .padding(.horizontal, 0)
-            .padding(.top, 0)
+            .frame(height: 32, alignment: .leading)
+            .padding(.horizontal, 6)
+            .padding(.top, 1)
             .background(
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.white.opacity(0.05))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(color.opacity(0.3), lineWidth: 1)
+                    .stroke(color.opacity(0.3), lineWidth: 1.5)
             )
             
             // Content

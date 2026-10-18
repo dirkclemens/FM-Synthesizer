@@ -84,7 +84,9 @@ struct GlobalPanel: View {
                     )
                 }
                 
-                HStack {
+                Spacer()
+
+                HStack() {
                     // LFO wave
                     Picker("LFO Wave", selection: $engine.lfoWave) {
                         ForEach(LFOWave.allCases, id: \.self) { wave in
