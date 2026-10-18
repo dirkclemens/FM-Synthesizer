@@ -3,7 +3,8 @@
 // Synthesizer
 //
 // Visualizes the audio signal chain: voice operators → voice source nodes →
-// main mixer → effects chain → output node.
+// main mixer → effects chain → output node. Shows which modules are active
+// and whether audio signal is flowing through each stage.
 //
 
 import SwiftUI
@@ -44,10 +45,10 @@ struct AudioChainView: View {
  HStack {
  ZStack {
  Circle()
- .fill(Color.cyan.opacity(0.2))
+ .fill(Color.blue.opacity(0.2))
  .frame(width: 24, height: 24)
  Circle()
- .stroke(Color.cyan, lineWidth: 2)
+ .stroke(Color.blue, lineWidth: 2)
  .frame(width: 24, height: 24)
  .overlay(
  Text("FM")
@@ -66,7 +67,7 @@ struct AudioChainView: View {
  }
  }
 
- // MARK: - Voice Nodes
+ // MARK: - Voice Nodes Section
 
  private var voiceNodesSection: some View {
  VStack(spacing: 6) {
@@ -84,7 +85,7 @@ struct AudioChainView: View {
  }
  }
 
- // MARK: - Voice Node
+ // MARK: - Voice Node View
 
  private func voiceNodeView(voice: Voice, index: Int) -> some View {
  VStack(spacing: 3) {
@@ -178,7 +179,7 @@ struct AudioChainView: View {
  .frame(width: 80)
  }
 
- // MARK: - Arrow
+ // MARK: - Arrow Node
 
  private var arrowNodeView: some View {
  Image(systemName: "chevron.right")
@@ -186,7 +187,7 @@ struct AudioChainView: View {
  .foregroundColor(.gray.opacity(0.5))
  }
 
- // MARK: - Effects Chain
+ // MARK: - Effects
 
  private func effectNodeView(effect: EffectType, isOn: Bool) -> some View {
  HStack(spacing: 4) {
@@ -201,7 +202,7 @@ struct AudioChainView: View {
  .frame(width: 62)
  }
 
- // MARK: - Computed Properties
+ // MARK: - Helpers
 
  private var mixerColor: Color {
  engine.isRunning ? Color.blue : Color.gray.opacity(0.3)
@@ -233,17 +234,6 @@ struct AudioChainView: View {
  }
  }
 
- private func effectColor(_ type: EffectType) -> Color {
- switch type {
- case .filter: return Color.blue
- case .distortion: return Color.orange
- case .chorus: return Color.green
- case .delay: return Color.purple
- case .reverb: return Color.blue.opacity(0.7)
- case .phaser: return Color.purple.opacity(0.7)
- }
- }
-
  private func effectShortName(_ type: EffectType) -> String {
  switch type {
  case .filter: return "Filter"
@@ -252,6 +242,17 @@ struct AudioChainView: View {
  case .delay: return "Delay"
  case .reverb: return "Reverb"
  case .phaser: return "Phaser"
+ }
+ }
+
+ private func effectColor(_ type: EffectType) -> Color {
+ switch type {
+ case .filter: return Color.blue
+ case .distortion: return Color.orange
+ case .chorus: return Color.green
+ case .delay: return Color.purple
+ case .reverb: return Color.blue.opacity(0.7)
+ case .phaser: return Color.purple.opacity(0.7)
  }
  }
 }
