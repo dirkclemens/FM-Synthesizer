@@ -77,21 +77,16 @@ final class Arpeggiator: ObservableObject {
     // MARK: - Note holding
  
     /// Holds a note (called on key down).
-    /// When the arpeggiator is running, the note is played immediately
-    /// and added to the sequence for subsequent ticks.
+    /// When the arpeggiator is running, the note is added to the held set
+    /// but not played immediately — the timer cycles through held notes
+    /// on its own schedule. This prevents multiple simultaneous notes
+    /// when keys are pressed together.
     func holdNote(_ note: UInt8) {
         heldNotes.insert(note)
         if !noteOrder.contains(note) {
             noteOrder.append(note)
         }
         resetPosition()
-        // Play the note immediately when arpeggiator is running,
-        // so pressing a key produces sound right away.
-        if isRunning {
-            lastNote = note
-            engine?.noteOn(midiNote: note, velocity: noteVelocity())
-            notesSounding.insert(note)
-        }
     }
  
     /// Releases a held note (called on key up).
