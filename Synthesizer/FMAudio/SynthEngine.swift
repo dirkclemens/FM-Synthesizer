@@ -159,9 +159,6 @@ final class SynthEngine: ObservableObject {
             )
         }
 
-        audioEngine.connect(mainMixer, to: outputNode, format: nil)
-        print("[SynthEngine] mainMixer connected to outputNode")
-
         effects.rebuildChain()
         print("[SynthEngine] effects.rebuildChain() called")
 

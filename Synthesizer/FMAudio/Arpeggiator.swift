@@ -29,7 +29,7 @@ final class Arpeggiator: ObservableObject {
     @Published private(set) var isRunning: Bool = false
  
     /// Current mode.
-    @Published var mode: ArpMode = .up {
+    var mode: ArpMode = .up {
         didSet { resetPosition() }
     }
  
