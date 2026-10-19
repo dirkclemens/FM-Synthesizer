@@ -34,7 +34,14 @@ final class Arpeggiator: ObservableObject {
     }
  
     /// Rate in notes per second (0.5...20).
-    @Published var rate: Float = 4.0
+    /// Changing the rate restarts the timer so the new rate takes effect immediately.
+    @Published var rate: Float = 4.0 {
+        didSet {
+            if isRunning {
+                startTimer()
+            }
+        }
+    }
  
     /// Gate length as fraction of step (0.1...1.0).
     @Published var gate: Float = 0.7
@@ -70,15 +77,21 @@ final class Arpeggiator: ObservableObject {
     // MARK: - Note holding
  
     /// Holds a note (called on key down).
-    /// When the arpeggiator is running, the note is added to the held set
-    /// and will be played on the next tick — it is not played immediately
-    /// to avoid rapid note on/off cycling with the timer.
+    /// When the arpeggiator is running, the note is played immediately
+    /// and added to the sequence for subsequent ticks.
     func holdNote(_ note: UInt8) {
         heldNotes.insert(note)
         if !noteOrder.contains(note) {
             noteOrder.append(note)
         }
         resetPosition()
+        // Play the note immediately when arpeggiator is running,
+        // so pressing a key produces sound right away.
+        if isRunning {
+            lastNote = note
+            engine?.noteOn(midiNote: note, velocity: noteVelocity())
+            notesSounding.insert(note)
+        }
     }
  
     /// Releases a held note (called on key up).
@@ -112,15 +125,15 @@ final class Arpeggiator: ObservableObject {
         // Play the first held note immediately so there's no delay
         // between turning on the arpeggiator and hearing sound.
         if !heldNotes.isEmpty {
-            let sortedNotes = heldNotes.sorted()
-            playNote(sortedNotes[0])
+            let notes = notesWithOctaves(heldNotes.sorted())
+            playNote(notes[0])
             // Release after gate duration
             let interval = 1.0 / Double(rate)
             let gateSeconds = interval * Double(gate)
             DispatchQueue.main
                 .asyncAfter(deadline: .now() + gateSeconds) { [weak self] in
-                    self?.engine?.noteOff(midiNote: sortedNotes[0])
-                    self?.notesSounding.remove(sortedNotes[0])
+                    self?.engine?.noteOff(midiNote: notes[0])
+                    self?.notesSounding.remove(notes[0])
                 }
         }
     }
@@ -160,16 +173,8 @@ final class Arpeggiator: ObservableObject {
         switch mode {
         case .chord:
             // Play all notes simultaneously.
-            // Scale velocity per note to avoid clipping with many notes.
-            let noteCount = heldNotes.count
-            let velocity: Float
-            if noteCount <= 1 {
-                velocity = 100
-            } else {
-                velocity = Float(100) / Float(noteCount)
-            }
             for note in heldNotes.sorted() {
-                engine?.noteOn(midiNote: note, velocity: velocity)
+                engine?.noteOn(midiNote: note, velocity: noteVelocity())
                 notesSounding.insert(note)
             }
             // Release all chord notes after gate duration
@@ -181,30 +186,34 @@ final class Arpeggiator: ObservableObject {
  
         default:
             // Release the previously sounding note (if any) before playing the next one.
-            // We only release the last played note, not all held notes — held notes
-            // remain available for subsequent ticks.
             releaseLastSoundingNote()
 
-            let sortedNotes = heldNotes.sorted()
+            // Build the note list with octave range applied.
+            let baseNotes = heldNotes.sorted()
+            let notes = notesWithOctaves(baseNotes)
+            guard !notes.isEmpty else { return }
 
             let note: UInt8
             switch mode {
             case .up:
-                note = sortedNotes[position % sortedNotes.count]
+                note = notes[position % notes.count]
             case .down:
-                let reversed = Array(sortedNotes.reversed())
+                let reversed = Array(notes.reversed())
                 note = reversed[position % reversed.count]
             case .upDown:
-                note = playUpDownNote(sortedNotes)
+                note = playUpDownNote(notes)
             case .random:
-                note = sortedNotes.randomElement() ?? 60
+                note = notes.randomElement() ?? 60
             case .ordered:
-                guard !noteOrder.isEmpty else { return }
-                note = noteOrder[position % noteOrder.count]
+                let orderedNotes = noteOrder.map { n in
+                    notesWithOctaves([n]).first ?? n
+                }
+                guard !orderedNotes.isEmpty else { return }
+                note = orderedNotes[position % orderedNotes.count]
             case .noteRepeat:
                 note = lastNote
             default:
-                note = sortedNotes[position % sortedNotes.count]
+                note = notes[position % notes.count]
             }
 
             playNote(note)
@@ -243,18 +252,18 @@ final class Arpeggiator: ObservableObject {
  
     private func playNote(_ note: UInt8) {
         lastNote = note
-        // Scale velocity down when multiple notes sound simultaneously
-        // to avoid clipping. Single note = full velocity (100), each
-        // additional note reduces velocity.
-        let noteCount = heldNotes.count
-        let velocity: Float
-        if noteCount <= 1 {
-            velocity = 100
-        } else {
-            velocity = Float(100) / Float(noteCount)
-        }
-        engine?.noteOn(midiNote: note, velocity: velocity)
+        engine?.noteOn(midiNote: note, velocity: noteVelocity())
         notesSounding.insert(note)
+    }
+
+    /// Returns the per-note velocity, scaled down when multiple notes sound
+    /// simultaneously to avoid clipping.
+    private func noteVelocity() -> Float {
+        let noteCount = heldNotes.count
+        if noteCount <= 1 {
+            return 100
+        }
+        return Float(100) / Float(noteCount)
     }
  
     private func releaseSoundingNotes() {
