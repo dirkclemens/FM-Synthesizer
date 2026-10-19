@@ -160,8 +160,16 @@ final class Arpeggiator: ObservableObject {
         switch mode {
         case .chord:
             // Play all notes simultaneously.
+            // Scale velocity per note to avoid clipping with many notes.
+            let noteCount = heldNotes.count
+            let velocity: Float
+            if noteCount <= 1 {
+                velocity = 100
+            } else {
+                velocity = Float(100) / Float(noteCount)
+            }
             for note in heldNotes.sorted() {
-                engine?.noteOn(midiNote: note, velocity: 100)
+                engine?.noteOn(midiNote: note, velocity: velocity)
                 notesSounding.insert(note)
             }
             // Release all chord notes after gate duration
@@ -235,7 +243,17 @@ final class Arpeggiator: ObservableObject {
  
     private func playNote(_ note: UInt8) {
         lastNote = note
-        engine?.noteOn(midiNote: note, velocity: 100)
+        // Scale velocity down when multiple notes sound simultaneously
+        // to avoid clipping. Single note = full velocity (100), each
+        // additional note reduces velocity.
+        let noteCount = heldNotes.count
+        let velocity: Float
+        if noteCount <= 1 {
+            velocity = 100
+        } else {
+            velocity = Float(100) / Float(noteCount)
+        }
+        engine?.noteOn(midiNote: note, velocity: velocity)
         notesSounding.insert(note)
     }
  

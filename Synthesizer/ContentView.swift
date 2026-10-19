@@ -20,24 +20,23 @@ struct ContentView: View {
         VStack(spacing: 0) {
             // MARK: MIDI Connection
             MIDIConnectionView(midiManager: midiManager, engine: engine)
-            
+
             Spacer().padding(0)
-            
+
             // MARK: GlobalPanel + Preset Browser
             HStack(alignment: .top, spacing: 12) {
                 GlobalPanel(engine: engine)
                 PresetBrowserView(bank: bank, engine: engine)
             }
-            
+
             Spacer().padding(0)
 
             // MARK: Oscilloscope + Audio Chain
             HStack(alignment: .top, spacing: 12) {
                 OscilloscopeView(engine: engine)
                 AudioChainView(engine: engine)
-//                    .frame(minWidth: 1000)
             }
-            
+
             Spacer().padding(0)
 
             // MARK: Arpeggiator + Sequencer
@@ -45,15 +44,15 @@ struct ContentView: View {
                 ArpeggiatorView(arpeggiator: engine.arpeggiator)
                 SequencerView(sequencer: engine.sequencer)
             }
-            
+
             Spacer().padding(0)
 
             // MARK: Algorithm matrix + operator panels
             HStack(alignment: .top, spacing: 12) {
                 // Algorithm + operator matrix visualization
                 AlgorithmMatrixView(algorithmIndex: $engine.algorithmIndex)
-                    .frame(maxWidth: 260)                
-                
+                    .frame(maxWidth: 260)
+
                 // Six operator panels in a 2×3 grid
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 3), spacing: 8) {
                     ForEach(0..<6, id: \.self) { index in
@@ -62,7 +61,7 @@ struct ContentView: View {
                 }
                 .frame(maxWidth: .infinity)
             }
-            
+
             Spacer().padding(0)
 
             // MARK: Keyboard
@@ -71,17 +70,18 @@ struct ContentView: View {
                 KeyboardView(
                     onKeyDown: { note in
                         activeNotes.insert(note)
-                        if engine.arpeggiator.isRunning {
-                            engine.arpeggiator.holdNote(note)
-                        } else {
+                        // Always track the note for the arpeggiator,
+                        // even when it's not running — otherwise turning it
+                        // on later would have no held notes to play.
+                        engine.arpeggiator.holdNote(note)
+                        if !engine.arpeggiator.isRunning {
                             engine.noteOn(midiNote: note, velocity: 100)
                         }
                     },
                     onKeyUp: { note in
                         activeNotes.remove(note)
-                        if engine.arpeggiator.isRunning {
-                            arpeggiatorKeyUp(note: note)
-                        } else {
+                        engine.arpeggiator.releaseNote(note)
+                        if !engine.arpeggiator.isRunning {
                             engine.noteOff(midiNote: note)
                         }
                     },
@@ -123,22 +123,11 @@ struct ContentView: View {
     /// MIDI notes currently active from the Mac keyboard handler.
     private var macKeyboardActiveNotes: Set<UInt8> {
         Set(macKeyboardHandler.activeKeys.compactMap { macKeyToMIDINote[$0] })
-        
     }
-
-    /// Handle key up when arpeggiator is running: release from arpeggiator.
-    private func arpeggiatorKeyUp(note: UInt8) {
-        engine.arpeggiator.releaseNote(note)
-        // If arpeggiator has no held notes, stop it.
-        if engine.arpeggiator.heldNotes.isEmpty {
-            engine.arpeggiator.stop()
-        }
-    }
-                
 }
 
 struct ContentView_Previews: PreviewProvider {
-                static var previews: some View {
-                                ContentView()
-                }
+    static var previews: some View {
+        ContentView()
+    }
 }
