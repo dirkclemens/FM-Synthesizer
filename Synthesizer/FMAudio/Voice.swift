@@ -245,7 +245,15 @@ final class Voice {
         if let fbOp = algorithm.feedbackOperator {
             feedbackSample = currentSamples[fbOp]
         }
- 
-        return carrierSum
+
+        // Clamp carrier output to prevent a single voice from exceeding
+        // safe levels. When multiple voices sum in the engine, unclipped
+        // voices would cause digital clipping (saw-like harsh harmonics).
+        return clamp(carrierSum, -0.7, 0.7)
+    }
+
+    /// Clamps a value to the given range.
+    private func clamp(_ value: Float, _ min: Float, _ max: Float) -> Float {
+        Swift.min(Swift.max(value, min), max)
     }
 }
