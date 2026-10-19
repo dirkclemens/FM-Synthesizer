@@ -70,17 +70,15 @@ final class Arpeggiator: ObservableObject {
     // MARK: - Note holding
  
     /// Holds a note (called on key down).
+    /// When the arpeggiator is running, the note is added to the held set
+    /// and will be played on the next tick — it is not played immediately
+    /// to avoid rapid note on/off cycling with the timer.
     func holdNote(_ note: UInt8) {
         heldNotes.insert(note)
         if !noteOrder.contains(note) {
             noteOrder.append(note)
         }
         resetPosition()
-        // Play the note immediately when arpeggiator is running
-        if isRunning {
-            engine?.noteOn(midiNote: note, velocity: 100)
-            notesSounding.insert(note)
-        }
     }
  
     /// Releases a held note (called on key up).
@@ -111,6 +109,20 @@ final class Arpeggiator: ObservableObject {
         position = 0
         direction = 1
         startTimer()
+        // Play the first held note immediately so there's no delay
+        // between turning on the arpeggiator and hearing sound.
+        if !heldNotes.isEmpty {
+            let sortedNotes = heldNotes.sorted()
+            playNote(sortedNotes[0])
+            // Release after gate duration
+            let interval = 1.0 / Double(rate)
+            let gateSeconds = interval * Double(gate)
+            DispatchQueue.main
+                .asyncAfter(deadline: .now() + gateSeconds) { [weak self] in
+                    self?.engine?.noteOff(midiNote: sortedNotes[0])
+                    self?.notesSounding.remove(sortedNotes[0])
+                }
+        }
     }
  
     func stop() {
@@ -160,11 +172,13 @@ final class Arpeggiator: ObservableObject {
             return // Don't advance position for chord mode
  
         default:
-            // Release notes from previous tick
-            releaseSoundingNotes()
- 
+            // Release the previously sounding note (if any) before playing the next one.
+            // We only release the last played note, not all held notes — held notes
+            // remain available for subsequent ticks.
+            releaseLastSoundingNote()
+
             let sortedNotes = heldNotes.sorted()
- 
+
             let note: UInt8
             switch mode {
             case .up:
@@ -184,9 +198,9 @@ final class Arpeggiator: ObservableObject {
             default:
                 note = sortedNotes[position % sortedNotes.count]
             }
- 
+
             playNote(note)
- 
+
             // Release this note after gate duration
             DispatchQueue.main
                 .asyncAfter(deadline: .now() + gateSeconds) { [
@@ -196,7 +210,7 @@ final class Arpeggiator: ObservableObject {
                     self?.engine?.noteOff(midiNote: note)
                     self?.notesSounding.remove(note)
                 }
- 
+
             advancePosition()
         }
     }
@@ -230,6 +244,13 @@ final class Arpeggiator: ObservableObject {
             engine?.noteOff(midiNote: note)
         }
         notesSounding.removeAll()
+    }
+
+    /// Releases only the last played note (used between ticks to avoid cutting
+    /// off notes that are still being held by the user).
+    private func releaseLastSoundingNote() {
+        engine?.noteOff(midiNote: lastNote)
+        notesSounding.remove(lastNote)
     }
  
     private func advancePosition() {
